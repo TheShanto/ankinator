@@ -4,6 +4,17 @@ Ankinator is an Obsidian plugin that turns notes, selected text, or multiple fil
 
 The goal is to speed up flashcard creation without leaving your Obsidian workflow: select the content, choose how many cards to generate, and send them directly into your Anki deck.
 
+## Privacy and external services
+
+Ankinator does not require payment or an account. It does not display advertisements and does not collect server-side telemetry. The plugin does not include a separate privacy policy because it does not send analytics or usage data to a telemetry service.
+
+The plugin uses network requests only for the services required to generate and create cards:
+
+- **LLM provider:** You can use a local OpenAI-compatible service, such as Ollama, or an external provider such as OpenAI, OpenRouter, Groq, Together AI, DeepSeek, Mistral, or a custom endpoint. When an external provider is selected, the note content or selected text is sent to that provider to generate cards. The provider API key is sent only as authentication for that request. Review the provider's privacy policy and terms before sending sensitive content.
+- **AnkiConnect:** The plugin connects to the AnkiConnect URL configured by you, normally a local Anki instance at `http://localhost:8765`, to read available decks and note types and to create cards. Generated card content is sent to Anki through this connection.
+
+When a local LLM is selected, the note content is sent to the configured local endpoint instead of a cloud provider. The plugin does not access files outside the Obsidian vault; it reads only the active note, selected notes, or files explicitly selected in the plugin.
+
 ## What this project does
 
 - Generates study cards from the active note.

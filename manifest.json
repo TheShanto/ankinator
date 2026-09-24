@@ -3,9 +3,9 @@
 	"name": "Ankinator",
 	"version": "1.0.0",
 	"minAppVersion": "1.2.3",
-	"description": "Create easy AnkiCards directly into Obsidian, using LLM Models",
+	"description": "Generate Anki flashcards from Obsidian notes with local or cloud LLMs and send them to Anki through AnkiConnect.",
 	"author": "Pedro RB.",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"authorUrl": "https://github.com/theshanto",
+	"fundingUrl": "https://buymeacoffee.com/theshanto",
 	"isDesktopOnly": true
 }
