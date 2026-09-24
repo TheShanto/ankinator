@@ -145,6 +145,8 @@ Contributions are welcome. To contribute in a clean and consistent way:
 
 ## License
 
+Copyright (C) 2026 Pedro Remigio Bracamontes
+
 This project is licensed under the GNU General Public License v3.0 or later.
 
 You may use, study, modify, and redistribute this software under the terms of
