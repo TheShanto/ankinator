@@ -47,6 +47,10 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
+    getSettingDefinitions(): [] {
+        return [];
+    }
+
     private getCurrentRemoteBaseUrl(): string {
         const customUrl = this.plugin.settings.customProviderUrl.trim().replace(/\/+$/, '');
 
@@ -68,7 +72,9 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: t('settings.title') });
+        new Setting(containerEl)
+            .setName(t('settings.title'))
+            .setHeading();
 
         new Setting(containerEl)
             .setName(t('settings.aiEnvironment'))
@@ -77,12 +83,12 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                 .addOption('local', t('settings.local'))
                 .addOption('provider', t('settings.externalProvider'))
                 .setValue(this.plugin.settings.llmMode)
-                .onChange(async (value) => {
+                .onChange((value) => {
                     const nextMode = value === 'provider' ? 'provider' : 'local';
                     this.plugin.settings.llmMode = nextMode;
                     this.availableModels = [];
                     this.plugin.settings.selectedModel = '';
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                     this.display();
                 }));
 
@@ -93,9 +99,9 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                 .addText(text => text
                     .setPlaceholder(t('settings.localBaseUrlPlaceholder'))
                     .setValue(this.plugin.settings.localUrl)
-                    .onChange(async (value) => {
+                    .onChange((value) => {
                         this.plugin.settings.localUrl = value.trim();
-                        await this.plugin.saveSettings();
+                        void this.plugin.saveSettings();
                     }));
         } else {
             new Setting(containerEl)
@@ -109,11 +115,11 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     });
 
                     drop.setValue(this.plugin.settings.providerId)
-                        .onChange(async (value) => {
+                        .onChange((value) => {
                             this.plugin.settings.providerId = value;
                             this.availableModels = [];
                             this.plugin.settings.selectedModel = '';
-                            await this.plugin.saveSettings();
+                            void this.plugin.saveSettings();
                             this.display();
                         });
                 });
@@ -138,9 +144,9 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     text.setPlaceholder(t('settings.apiKeyPlaceholder'))
                         .setValue(this.plugin.settings.apiKey);
                     text.inputEl.type = 'password';
-                    text.onChange(async (value) => {
+                    text.onChange((value) => {
                         this.plugin.settings.apiKey = value.trim();
-                        await this.plugin.saveSettings();
+                        void this.plugin.saveSettings();
                     });
                 });
         }
@@ -155,7 +161,9 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
 
         if (this.availableModels.length > 0) {
             modelSetting.addDropdown(drop => {
-                this.availableModels.forEach((model) => drop.addOption(model, model));
+                this.availableModels.forEach((model) => {
+                    drop.addOption(model, model);
+                });
 
                 const valueToSet = this.availableModels.includes(this.plugin.settings.selectedModel)
                     ? this.plugin.settings.selectedModel
@@ -168,9 +176,9 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     void this.plugin.saveSettings();
                 }
 
-                drop.onChange(async (value) => {
+                drop.onChange((value) => {
                     this.plugin.settings.selectedModel = value;
-                    await this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 });
             });
         }
@@ -178,9 +186,38 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
         modelSetting.addButton(btn => btn
             .setButtonText(this.isFetchingModels ? t('settings.loading') : t('settings.loadModels'))
             .setDisabled(this.isFetchingModels)
-            .onClick(async () => {
-                this.isFetchingModels = true;
-                this.display();
+            .onClick(() => {
+                void this.loadAvailableModels();
+            }));
+
+        containerEl.createEl('hr');
+        new Setting(containerEl)
+            .setName(t('settings.ankiConnectTitle'))
+            .setHeading();
+
+        new Setting(containerEl)
+            .setName(t('settings.ankiConnectUrl'))
+            .setDesc(t('settings.ankiConnectUrlDesc'))
+            .addText(text => text
+            .setPlaceholder(t('settings.ankiConnectUrlPlaceholder'))
+            .setValue(this.plugin.settings.ankiConnectUrl)
+            .onChange((value) => {
+                this.plugin.settings.ankiConnectUrl = value.trim();
+                void this.plugin.saveSettings();
+            }))
+            .addButton(button => button
+            .setButtonText(this.isTestingAnkiConnection
+                ? t('settings.testingAnkiConnection')
+                : t('settings.testAnkiConnection'))
+            .setDisabled(this.isTestingAnkiConnection)
+            .onClick(() => {
+                void this.testAnkiConnection();
+            }));
+    }
+
+    private async loadAvailableModels(): Promise<void> {
+            this.isFetchingModels = true;
+            this.display();
 
                 try {
                     const currentUrl = this.getCurrentBaseUrl();
@@ -212,29 +249,9 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     this.isFetchingModels = false;
                     this.display();
                 }
-            }));
+    }
 
-        containerEl.createEl('hr');
-        new Setting(containerEl)
-            .setName(t('settings.ankiConnectTitle'))
-            .setHeading();
-
-        new Setting(containerEl)
-            .setName(t('settings.ankiConnectUrl'))
-            .setDesc(t('settings.ankiConnectUrlDesc'))
-            .addText(text => text
-                .setPlaceholder(t('settings.ankiConnectUrlPlaceholder'))
-                .setValue(this.plugin.settings.ankiConnectUrl)
-                .onChange(async (value) => {
-                    this.plugin.settings.ankiConnectUrl = value.trim();
-                    await this.plugin.saveSettings();
-                }))
-            .addButton(button => button
-                .setButtonText(this.isTestingAnkiConnection
-                    ? t('settings.testingAnkiConnection')
-                    : t('settings.testAnkiConnection'))
-                .setDisabled(this.isTestingAnkiConnection)
-                .onClick(async () => {
+    private async testAnkiConnection(): Promise<void> {
                     this.isTestingAnkiConnection = true;
                     this.display();
 
@@ -252,7 +269,5 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                         this.isTestingAnkiConnection = false;
                         this.display();
                     }
-                }));
-
     }
 }
