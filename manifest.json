@@ -1,0 +1,11 @@
+{
+	"id": "ankinator",
+	"name": "Ankinator",
+	"version": "1.0.0",
+	"minAppVersion": "1.2.3",
+	"description": "Create easy AnkiCards directly into Obsidian, using LLM Models",
+	"author": "Pedro RB.",
+	"authorUrl": "https://obsidian.md",
+	"fundingUrl": "https://obsidian.md/pricing",
+	"isDesktopOnly": true
+}
