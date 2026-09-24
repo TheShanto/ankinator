@@ -1,3 +1,4 @@
+import { getLanguage as getObsidianLanguage } from 'obsidian';
 import en from './en.json';
 import es from './es.json';
 
@@ -15,13 +16,8 @@ function isLanguage(value: string | null): value is Language {
 }
 
 export function getLanguage(): Language {
-	if (typeof window === 'undefined') {
-		return 'en';
-	}
-
 	try {
-		const configuredLanguage = window.localStorage.getItem('language')?.toLowerCase();
-		const language = configuredLanguage?.split('-')[0] ?? null;
+		const language = getObsidianLanguage().toLowerCase().split('-')[0] ?? null;
 
 		return isLanguage(language) ? language : 'en';
 	} catch (error) {
