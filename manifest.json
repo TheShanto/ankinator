@@ -2,6 +2,7 @@
 	"id": "ankinator",
 	"name": "Ankinator",
 	"version": "1.0.0",
+	"license": "GPL-3.0-or-later",
 	"minAppVersion": "1.8.7",
 	"description": "Generate Anki flashcards from Obsidian notes with local or cloud LLMs and send them to Anki through AnkiConnect.",
 	"author": "Pedro RB.",

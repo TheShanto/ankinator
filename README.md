@@ -145,9 +145,12 @@ Contributions are welcome. To contribute in a clean and consistent way:
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the GNU General Public License v3.0 or later.
 
-The MIT License allows you to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, provided that the copyright notice and permission notice are included in all copies or substantial portions of the software.
+You may use, study, modify, and redistribute this software under the terms of
+the GPL-3.0-or-later license. Distributed versions must preserve the same
+freedoms and provide the corresponding source code under the applicable license
+terms.
 
 The full license text is included in [LICENSE](./LICENSE).
 
