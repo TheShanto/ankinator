@@ -86,7 +86,7 @@ export class NoteSelectionModal extends Modal {
 				}
 				this.updateSelectionCount();
 			});
-			row.createEl('span', { text: file.path });
+			row.createSpan({ text: file.path });
 		}
 	}
 
