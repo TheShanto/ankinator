@@ -71,6 +71,11 @@ export class AnkiController {
 			flashcards.push(...cards);
 		}
 
+		// Enforce the cap on actual model output before any cards are sent to Anki.
+		if (flashcards.length > MAX_GENERATED_CARDS) {
+			throw new Error(t('errors.cardLimit', { count: MAX_GENERATED_CARDS }));
+		}
+
 		if (flashcards.length === 0) {
 			throw new Error(t('notices.noCards'));
 		}
