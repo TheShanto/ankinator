@@ -74,6 +74,38 @@
 		"ankiModelNameDesc": "Enter the exact note type name from Anki, including its language and capitalization.",
 		"ankiModelNamePlaceholder": "Basic"
 	},
+	"help": {
+		"title": "Help",
+		"open": "Open guide",
+		"apiKey": {
+			"label": "How to get an API key",
+			"description": "Choose your provider below to create an API key.",
+			"title": "How to get an API key",
+			"intro": "Create an account with one of these providers, open its API keys page, and create a new secret key. Copy it once and keep it private.",
+			"providers": {
+				"openai": "OpenAI: platform.openai.com/api-keys",
+				"openrouter": "OpenRouter: openrouter.ai/keys",
+				"groq": "Groq: console.groq.com/keys",
+				"together": "Together AI: api.together.ai/settings/api-keys",
+				"deepseek": "DeepSeek: platform.deepseek.com/api_keys",
+				"mistral": "Mistral: console.mistral.ai/api-keys"
+			},
+			"finalStep": "Return to this settings page, select External Provider, choose the provider, and paste the key into API Key. Never share your key or commit it to a note or repository."
+		},
+		"anki": {
+			"label": "How to configure Anki",
+			"description": "Follow these steps to connect Anki to the plugin.",
+			"title": "How to configure Anki",
+			"intro": "AnkiConnect lets this plugin send cards to your desktop Anki application.",
+			"steps": {
+				"download": "Download and install Anki for your operating system from apps.ankiweb.net.",
+				"plugin": "Open Anki, go to Tools > Add-ons > Get Add-ons, enter code 2055492159, and install AnkiConnect.",
+				"restart": "Restart Anki after installing the add-on.",
+				"configure": "Keep Anki open and make sure the AnkiConnect URL in this plugin is http://localhost:8765."
+			},
+			"finalStep": "Use Test connection above to verify the setup. If it succeeds, the plugin is ready to create cards in Anki."
+		}
+	},
 	"providers": {
 		"openai": "OpenAI",
 		"openrouter": "OpenRouter",
