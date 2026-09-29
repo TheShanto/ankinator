@@ -74,6 +74,38 @@
 		"ankiModelNameDesc": "Escribe el nombre exacto del tipo de nota en Anki, respetando su idioma y mayúsculas.",
 		"ankiModelNamePlaceholder": "Basic"
 	},
+	"help": {
+		"title": "Ayuda",
+		"open": "Abrir guía",
+		"apiKey": {
+			"label": "Cómo obtener una API Key",
+			"description": "Elige tu proveedor para crear una API Key.",
+			"title": "Cómo obtener una API Key",
+			"intro": "Crea una cuenta con uno de estos proveedores, abre su página de API Keys y crea una clave secreta. Cópiala una sola vez y mantenla privada.",
+			"providers": {
+				"openai": "OpenAI: platform.openai.com/api-keys",
+				"openrouter": "OpenRouter: openrouter.ai/keys",
+				"groq": "Groq: console.groq.com/keys",
+				"together": "Together AI: api.together.ai/settings/api-keys",
+				"deepseek": "DeepSeek: platform.deepseek.com/api_keys",
+				"mistral": "Mistral: console.mistral.ai/api-keys"
+			},
+			"finalStep": "Vuelve a esta página de configuración, selecciona Proveedor Externo, elige el proveedor y pega la clave en API Key. Nunca compartas tu clave ni la guardes en una nota o repositorio."
+		},
+		"anki": {
+			"label": "Cómo configurar Anki",
+			"description": "Sigue estos pasos para conectar Anki con el plugin.",
+			"title": "Cómo configurar Anki",
+			"intro": "AnkiConnect permite que este plugin envíe tarjetas a tu aplicación de Anki de escritorio.",
+			"steps": {
+				"download": "Descarga e instala Anki para tu sistema operativo desde apps.ankiweb.net.",
+				"plugin": "Abre Anki, ve a Herramientas > Complementos > Obtener complementos, introduce el código 2055492159 e instala AnkiConnect.",
+				"restart": "Reinicia Anki después de instalar el complemento.",
+				"configure": "Mantén Anki abierto y comprueba que la URL de AnkiConnect en este plugin sea http://localhost:8765."
+			},
+			"finalStep": "Usa Probar conexión arriba para verificar la configuración. Si funciona, el plugin está listo para crear tarjetas en Anki."
+		}
+	},
 	"providers": {
 		"openai": "OpenAI",
 		"openrouter": "OpenRouter",

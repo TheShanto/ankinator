@@ -1,8 +1,72 @@
-import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
+import { App, Modal, Notice, PluginSettingTab, Setting } from 'obsidian';
 import AnkiOpenCodePlugin from './main';
 import { AnkiConnectApi, DEFAULT_ANKI_CONNECT_SETTINGS } from './services/ankiConnectApi';
 import { LLMConnector } from './services/llmApi';
 import { t } from './i18n';
+
+class HelpModal extends Modal {
+    constructor(
+        app: App,
+        private readonly topic: 'apiKey' | 'anki',
+    ) {
+        super(app);
+    }
+
+    onOpen(): void {
+        const { contentEl } = this;
+        contentEl.empty();
+
+        if (this.topic === 'apiKey') {
+            this.renderApiKeyHelp(contentEl);
+        } else {
+            this.renderAnkiHelp(contentEl);
+        }
+    }
+
+    onClose(): void {
+        this.contentEl.empty();
+    }
+
+    private renderApiKeyHelp(containerEl: HTMLElement): void {
+        containerEl.createEl('h2', { text: t('help.apiKey.title') });
+        containerEl.createEl('p', { text: t('help.apiKey.intro') });
+
+        const providers = [
+            'openai',
+            'openrouter',
+            'groq',
+            'together',
+            'deepseek',
+            'mistral',
+        ] as const;
+        const providerList = containerEl.createEl('ul');
+
+        providers.forEach((provider) => {
+            providerList.createEl('li', { text: t(`help.apiKey.providers.${provider}`) });
+        });
+
+        containerEl.createEl('p', { text: t('help.apiKey.finalStep') });
+    }
+
+    private renderAnkiHelp(containerEl: HTMLElement): void {
+        containerEl.createEl('h2', { text: t('help.anki.title') });
+        containerEl.createEl('p', { text: t('help.anki.intro') });
+
+        const steps = [
+            'download',
+            'plugin',
+            'restart',
+            'configure',
+        ] as const;
+        const stepList = containerEl.createEl('ol');
+
+        steps.forEach((step) => {
+            stepList.createEl('li', { text: t(`help.anki.steps.${step}`) });
+        });
+
+        containerEl.createEl('p', { text: t('help.anki.finalStep') });
+    }
+}
 
 export const LLM_PROVIDERS: Record<string, { baseUrl: string }> = {
     openai: { baseUrl: 'https://api.openai.com/v1' },
@@ -213,6 +277,31 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
             .onClick(() => {
                 void this.testAnkiConnection();
             }));
+
+        containerEl.createEl('hr');
+        new Setting(containerEl)
+            .setName(t('help.title'))
+            .setHeading();
+
+        new Setting(containerEl)
+            .setName(t('help.apiKey.label'))
+            .setDesc(t('help.apiKey.description'))
+            .addButton((button) => button
+                .setButtonText('?')
+                .setTooltip(t('help.open'))
+                .onClick(() => {
+                    new HelpModal(this.app, 'apiKey').open();
+                }));
+
+        new Setting(containerEl)
+            .setName(t('help.anki.label'))
+            .setDesc(t('help.anki.description'))
+            .addButton((button) => button
+                .setButtonText('?')
+                .setTooltip(t('help.open'))
+                .onClick(() => {
+                    new HelpModal(this.app, 'anki').open();
+                }));
     }
 
     private async loadAvailableModels(): Promise<void> {
