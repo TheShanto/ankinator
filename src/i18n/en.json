@@ -131,6 +131,7 @@
 		"modelNotFound": "Anki could not find the note type \"{model}\". Check the exact name in Anki.",
 		"missingModelFields": "The selected note type does not have at least two fields.",
 		"missingProviderUrl": "Enter the provider URL or choose one from the list.",
+		"selectedFileUnavailable": "The selected note is no longer available: {file}",
 		"missingApiKey": "Add the API key before loading models.",
 		"noModels": "No models were found. Check the URL, provider, and API key.",
 		"modelsLoaded": "{count} models loaded successfully.",

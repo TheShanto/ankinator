@@ -40,10 +40,17 @@ export class AnkiController {
 		const modelFields = new Map(ankiModels.map((model) => [model.name, model.fieldNames]));
 
 		const notes = selectedFiles
-			? await Promise.all(selectedFiles.map(async (file) => ({
-				file,
-				text: await this.plugin.app.vault.cachedRead(file),
-			})))
+			? await Promise.all(selectedFiles.map(async (file) => {
+				const currentFile = this.plugin.app.vault.getAbstractFileByPath(file.path);
+				if (!(currentFile instanceof TFile)) {
+					throw new Error(t('errors.selectedFileUnavailable', { file: file.path }));
+				}
+
+				return {
+					file: currentFile,
+					text: await this.plugin.app.vault.cachedRead(currentFile),
+				};
+			}))
 			: [{ file: undefined, text: this.getActiveNoteText() }];
 
 		if (notes.length * normalizedCardCount > MAX_GENERATED_CARDS) {

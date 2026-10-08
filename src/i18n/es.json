@@ -131,6 +131,7 @@
 		"modelNotFound": "Anki no encontró el tipo de nota \"{model}\". Revisa el nombre exacto en Anki.",
 		"missingModelFields": "El tipo de nota seleccionado no tiene al menos dos campos.",
 		"missingProviderUrl": "Debes indicar la URL del proveedor o elegir uno de la lista.",
+		"selectedFileUnavailable": "La nota seleccionada ya no está disponible: {file}",
 		"missingApiKey": "Añade la API Key antes de cargar modelos.",
 		"noModels": "No se encontraron modelos. Verifica la URL, el proveedor y la API Key.",
 		"modelsLoaded": "{count} modelos cargados con éxito.",
