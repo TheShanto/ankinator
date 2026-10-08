@@ -70,6 +70,9 @@ export class AnkiController {
 
 		const flashcards = [];
 		const ankiCardTypes = ankiModels.map((model) => model.name);
+		const ankiModelFields = Object.fromEntries(
+			ankiModels.map((model) => [model.name, model.fieldNames]),
+		);
 		for (const { text } of notes) {
 			const cards = await LLMConnector.generateFlashcards(
 				text,
@@ -78,6 +81,7 @@ export class AnkiController {
 				normalizedCardCount,
 				ankiModels[0]?.fieldNames ?? ['Front', 'Back'],
 				ankiCardTypes,
+				ankiModelFields,
 			);
 			if (this.plugin.isUnloaded()) {
 				return [];

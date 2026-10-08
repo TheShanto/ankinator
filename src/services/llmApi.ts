@@ -148,6 +148,7 @@ export class LLMConnector {
         cardCount: number = 3,
         fieldNames: string[] = ['Front', 'Back'],
         ankiCardTypes: string[] = [],
+        ankiModelFields: Record<string, string[]> = {},
     ): Promise<Flashcard[]> {
         const cleanBaseUrl = settings.baseUrl.trim().replace(/\/+$/, '');
 
@@ -161,7 +162,14 @@ export class LLMConnector {
         }
 
         const language = getLanguage();
-        const systemPrompt = getLlmSystemPrompt(cardCount, language, language, fieldNames, ankiCardTypes);
+        const systemPrompt = getLlmSystemPrompt(
+            cardCount,
+            language,
+            language,
+            fieldNames,
+            ankiCardTypes,
+            ankiModelFields,
+        );
 
         const requestParams: RequestUrlParam = {
             url: `${cleanBaseUrl}/chat/completions`,

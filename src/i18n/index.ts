@@ -69,11 +69,15 @@ export function getLlmSystemPrompt(
 	noteLanguage: Language = language,
 	fieldNames: string[] = ['Front', 'Back'],
 	ankiCardTypes: string[] = [],
+	ankiModelFields: Record<string, string[]> = {},
 ): string {
 	const resolvedCardTypes = ankiCardTypes.length > 0 ? ankiCardTypes : [];
 	const ankiMetadata = JSON.stringify({
 		noteTypes: resolvedCardTypes,
 		fields: fieldNames.slice(0, 2),
+		fieldsByNoteType: Object.fromEntries(
+			Object.entries(ankiModelFields).map(([name, fields]) => [name, fields.slice(0, 2)]),
+		),
 	}, null, 2);
 	const fieldInstruction = 'Use the first field in the configured Anki metadata for the question or cloze text and the second field for the answer.';
 
