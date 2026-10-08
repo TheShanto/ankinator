@@ -53,6 +53,10 @@ export class AnkiController {
 			}))
 			: [{ file: undefined, text: this.getActiveNoteText() }];
 
+		if (this.plugin.isUnloaded()) {
+			return [];
+		}
+
 		if (notes.length * normalizedCardCount > MAX_GENERATED_CARDS) {
 			throw new Error(t('errors.cardLimit', { count: MAX_GENERATED_CARDS }));
 		}
@@ -75,6 +79,10 @@ export class AnkiController {
 				ankiModels[0]?.fieldNames ?? ['Front', 'Back'],
 				ankiCardTypes,
 			);
+			if (this.plugin.isUnloaded()) {
+				return [];
+			}
+
 			flashcards.push(...cards);
 		}
 
@@ -103,12 +111,20 @@ export class AnkiController {
 
 		const noteIds: number[] = [];
 		for (const [cardModelName, cardsForModel] of groupedCards) {
+			if (this.plugin.isUnloaded()) {
+				return [];
+			}
+
 			noteIds.push(...await AnkiConnectApi.addNotes(cardsForModel, {
 				url,
 				deckName: deckName ?? this.plugin.settings.defaultDeck,
 				modelName: cardModelName,
 				fieldNames: modelFields.get(cardModelName) ?? [],
 			}));
+		}
+
+		if (this.plugin.isUnloaded()) {
+			return [];
 		}
 
 		new Notice(t('notices.success', { count: noteIds.length }));

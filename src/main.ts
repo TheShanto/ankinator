@@ -12,8 +12,10 @@ import { t } from './i18n';
 
 export default class AnkiOpenCodePlugin extends Plugin {
     settings!: AnkiPluginSettings;
+    private unloaded = false;
 
     async onload() {
+        this.unloaded = false;
         await this.loadSettings();
 
         this.addSettingTab(new AnkiOpenCodeSettingTab(this.app, this));
@@ -38,7 +40,11 @@ export default class AnkiOpenCodePlugin extends Plugin {
     }
 
     onunload() {
-        
+        this.unloaded = true;
+    }
+
+    isUnloaded(): boolean {
+        return this.unloaded;
     }
 
     // Auxiliar Functions to load data and save data in the plugin's data.json file
