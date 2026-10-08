@@ -13,10 +13,6 @@ export interface Flashcard {
     modelName?: string;
 }
 
-interface ModelsResponse {
-    data?: unknown;
-}
-
 interface ChatCompletionResponse {
     choices?: Array<{
         message?: {
@@ -121,8 +117,17 @@ export class LLMConnector {
                 throw new Error(t('errors.server', { status: response.status }));
             }
 
-            const modelsData = (response.json as ModelsResponse).data;
-            if (!Array.isArray(modelsData)) return [];
+            const responseJson: unknown = response.json;
+            if (
+                typeof responseJson !== 'object' ||
+                responseJson === null ||
+                !('data' in responseJson) ||
+                !Array.isArray(responseJson.data)
+            ) {
+                throw new Error(t('errors.invalidModelsResponse'));
+            }
+
+            const modelsData = responseJson.data;
 
             return modelsData.flatMap((model): string[] => {
                 if (
@@ -137,7 +142,7 @@ export class LLMConnector {
             });
         } catch (error) {
             console.error('Error al obtener modelos del LLM:', error);
-            return [];
+            throw error instanceof Error ? error : new Error(t('errors.modelsConnection'));
         }
     }
 

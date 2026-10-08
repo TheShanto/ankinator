@@ -137,6 +137,7 @@
 		"noModels": "No models were found. Check the URL, provider, and API key.",
 		"modelsLoaded": "{count} models loaded successfully.",
 		"modelsConnection": "Connection error while loading models.",
+		"invalidModelsResponse": "The model provider returned an invalid models response.",
 		"invalidCardCount": "The number of cards must be an integer greater than zero.",
 		"cardLimit": "The selection exceeds the limit of {count} cards per run."
 	}

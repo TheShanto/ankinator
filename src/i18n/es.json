@@ -137,6 +137,7 @@
 		"noModels": "No se encontraron modelos. Verifica la URL, el proveedor y la API Key.",
 		"modelsLoaded": "{count} modelos cargados con éxito.",
 		"modelsConnection": "Error de conexión al cargar modelos.",
+		"invalidModelsResponse": "El proveedor de modelos devolvió una respuesta de modelos no válida.",
 		"invalidCardCount": "La cantidad de tarjetas debe ser un número entero mayor que cero.",
 		"cardLimit": "La selección supera el límite de {count} tarjetas por ejecución."
 	}
