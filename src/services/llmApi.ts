@@ -66,7 +66,8 @@ function parseFlashcards(content: string): Flashcard[] {
 
         const [modelNameRaw, question, answer] = columns;
         const modelName = modelNameRaw?.trim();
-        if (!modelName || !question?.trim() || (!answer?.trim() && modelName.toLowerCase() !== 'cloze')) {
+        const isClozeModel = modelName?.toLowerCase().includes('cloze') ?? false;
+        if (!modelName || !question?.trim() || (!answer?.trim() && !isClozeModel)) {
             throw new Error('Incomplete TSV flashcard row.');
         }
 
