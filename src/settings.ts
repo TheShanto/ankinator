@@ -86,7 +86,6 @@ export interface AnkiPluginSettings {
     apiKey: string;
     selectedModel: string;
     ankiConnectUrl: string;
-    defaultDeck: string;
 }
 
 export const DEFAULT_SETTINGS: AnkiPluginSettings = {
@@ -97,7 +96,6 @@ export const DEFAULT_SETTINGS: AnkiPluginSettings = {
     apiKey: '',
     selectedModel: '',
     ankiConnectUrl: DEFAULT_ANKI_CONNECT_SETTINGS.url,
-    defaultDeck: 'Default',
 };
 
 export class AnkiOpenCodeSettingTab extends PluginSettingTab {
@@ -105,6 +103,7 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
     availableModels: string[] = [];
     isFetchingModels = false;
     isTestingAnkiConnection = false;
+    private modelsRequestGeneration = 0;
 
     constructor(app: App, plugin: AnkiOpenCodePlugin) {
         super(app, plugin);
@@ -150,6 +149,7 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                 .onChange((value) => {
                     const nextMode = value === 'provider' ? 'provider' : 'local';
                     this.plugin.settings.llmMode = nextMode;
+                    this.modelsRequestGeneration++;
                     this.availableModels = [];
                     this.plugin.settings.selectedModel = '';
                     void this.plugin.saveSettings();
@@ -165,6 +165,8 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.settings.localUrl)
                     .onChange((value) => {
                         this.plugin.settings.localUrl = value.trim();
+                        this.modelsRequestGeneration++;
+                        this.availableModels = [];
                         void this.plugin.saveSettings();
                     }));
         } else {
@@ -181,6 +183,7 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     drop.setValue(this.plugin.settings.providerId)
                         .onChange((value) => {
                             this.plugin.settings.providerId = value;
+                            this.modelsRequestGeneration++;
                             this.availableModels = [];
                             this.plugin.settings.selectedModel = '';
                             void this.plugin.saveSettings();
@@ -197,6 +200,8 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                         .setValue(this.plugin.settings.customProviderUrl)
                         .onChange(async (value) => {
                             this.plugin.settings.customProviderUrl = value.trim();
+                            this.modelsRequestGeneration++;
+                            this.availableModels = [];
                             await this.plugin.saveSettings();
                         }));
             }
@@ -210,6 +215,8 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     text.inputEl.type = 'password';
                     text.onChange((value) => {
                         this.plugin.settings.apiKey = value.trim();
+                        this.modelsRequestGeneration++;
+                        this.availableModels = [];
                         void this.plugin.saveSettings();
                     });
                 });
@@ -305,18 +312,22 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
     }
 
     private async loadAvailableModels(): Promise<void> {
+            const requestGeneration = ++this.modelsRequestGeneration;
+            const requestMode = this.plugin.settings.llmMode;
+            const requestUrl = this.getCurrentBaseUrl();
+            const requestKey = requestMode === 'local' ? '' : this.plugin.settings.apiKey.trim();
             this.isFetchingModels = true;
             this.display();
 
                 try {
-                    const currentUrl = this.getCurrentBaseUrl();
-                    const currentKey = this.plugin.settings.llmMode === 'local' ? '' : this.plugin.settings.apiKey.trim();
+                    const currentUrl = requestUrl;
+                    const currentKey = requestKey;
 
-                    if (this.plugin.settings.llmMode !== 'local' && !currentUrl) {
+                    if (requestMode !== 'local' && !currentUrl) {
                         throw new Error(t('errors.missingProviderUrl'));
                     }
 
-                    if (this.plugin.settings.llmMode !== 'local' && !currentKey) {
+                    if (requestMode !== 'local' && !currentKey) {
                         throw new Error(t('errors.missingApiKey'));
                     }
 
@@ -326,17 +337,34 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                         defaultModel: this.plugin.settings.selectedModel,
                     });
 
+                    if (
+                        requestGeneration !== this.modelsRequestGeneration ||
+                        requestMode !== this.plugin.settings.llmMode ||
+                        requestUrl !== this.getCurrentBaseUrl() ||
+                        requestKey !== (this.plugin.settings.llmMode === 'local'
+                            ? ''
+                            : this.plugin.settings.apiKey.trim())
+                    ) {
+                        return;
+                    }
+
                     if (this.availableModels.length === 0) {
                         new Notice(t('errors.noModels'));
                     } else {
                         new Notice(t('errors.modelsLoaded', { count: this.availableModels.length }));
                     }
                 } catch (error) {
+                    if (requestGeneration !== this.modelsRequestGeneration) {
+                        return;
+                    }
+
                     const message = error instanceof Error ? error.message : t('errors.modelsConnection');
                     new Notice(message);
                 } finally {
-                    this.isFetchingModels = false;
-                    this.display();
+                    if (requestGeneration === this.modelsRequestGeneration) {
+                        this.isFetchingModels = false;
+                        this.display();
+                    }
                 }
     }
 

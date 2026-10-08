@@ -1,6 +1,6 @@
 import { MarkdownView, Notice, TFile } from 'obsidian';
 import type AnkiOpenCodePlugin from '../main';
-import { AnkiConnectApi } from './ankiConnectApi';
+import { AnkiConnectApi, DEFAULT_ANKI_CONNECT_SETTINGS } from './ankiConnectApi';
 import { LLMConnector, LLMSettings } from './llmApi';
 import { LLM_PROVIDERS } from '../settings';
 import { t } from '../i18n';
@@ -40,11 +40,22 @@ export class AnkiController {
 		const modelFields = new Map(ankiModels.map((model) => [model.name, model.fieldNames]));
 
 		const notes = selectedFiles
-			? await Promise.all(selectedFiles.map(async (file) => ({
-				file,
-				text: await this.plugin.app.vault.cachedRead(file),
-			})))
+			? await Promise.all(selectedFiles.map(async (file) => {
+				const currentFile = this.plugin.app.vault.getAbstractFileByPath(file.path);
+				if (!(currentFile instanceof TFile)) {
+					throw new Error(t('errors.selectedFileUnavailable', { file: file.path }));
+				}
+
+				return {
+					file: currentFile,
+					text: await this.plugin.app.vault.cachedRead(currentFile),
+				};
+			}))
 			: [{ file: undefined, text: this.getActiveNoteText() }];
+
+		if (this.plugin.isUnloaded()) {
+			return [];
+		}
 
 		if (notes.length * normalizedCardCount > MAX_GENERATED_CARDS) {
 			throw new Error(t('errors.cardLimit', { count: MAX_GENERATED_CARDS }));
@@ -59,6 +70,9 @@ export class AnkiController {
 
 		const flashcards = [];
 		const ankiCardTypes = ankiModels.map((model) => model.name);
+		const ankiModelFields = Object.fromEntries(
+			ankiModels.map((model) => [model.name, model.fieldNames]),
+		);
 		for (const { text } of notes) {
 			const cards = await LLMConnector.generateFlashcards(
 				text,
@@ -67,7 +81,12 @@ export class AnkiController {
 				normalizedCardCount,
 				ankiModels[0]?.fieldNames ?? ['Front', 'Back'],
 				ankiCardTypes,
+				ankiModelFields,
 			);
+			if (this.plugin.isUnloaded()) {
+				return [];
+			}
+
 			flashcards.push(...cards);
 		}
 
@@ -96,12 +115,33 @@ export class AnkiController {
 
 		const noteIds: number[] = [];
 		for (const [cardModelName, cardsForModel] of groupedCards) {
-			noteIds.push(...await AnkiConnectApi.addNotes(cardsForModel, {
-				url,
-				deckName: deckName ?? this.plugin.settings.defaultDeck,
-				modelName: cardModelName,
-				fieldNames: modelFields.get(cardModelName) ?? [],
-			}));
+			if (this.plugin.isUnloaded()) {
+				return [];
+			}
+
+			try {
+				noteIds.push(...await AnkiConnectApi.addNotes(cardsForModel, {
+					url,
+					deckName: deckName ?? DEFAULT_ANKI_CONNECT_SETTINGS.deckName,
+					modelName: cardModelName,
+					fieldNames: modelFields.get(cardModelName) ?? [],
+				}));
+			} catch (error) {
+				if (noteIds.length > 0) {
+					const message = error instanceof Error ? error.message : t('errors.ankiConnection');
+					throw new Error(t('errors.partialAnkiCreation', {
+						count: noteIds.length,
+						model: cardModelName,
+						error: message,
+					}));
+				}
+
+				throw error;
+			}
+		}
+
+		if (this.plugin.isUnloaded()) {
+			return [];
 		}
 
 		new Notice(t('notices.success', { count: noteIds.length }));

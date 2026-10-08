@@ -15,8 +15,7 @@
 		"newDeckNamePlaceholder": "Nombre o ruta del mazo",
 		"model": "Tipo de nota",
 		"modelDesc": "Selecciona los tipos de nota que puede usar el LLM. Sus campos se cargan desde Anki.",
-		"fields": "Campos: {fields}",
-		"loadingModels": "Cargando tipos de nota..."
+		"fields": "Campos: {fields}"
 	},
 	"command": {
 		"createCards": "Crear tarjetas de Anki",
@@ -69,10 +68,7 @@
 		"ankiConnectUrlPlaceholder": "http://localhost:8765",
 		"testAnkiConnection": "Probar conexión",
 		"testingAnkiConnection": "Probando conexión...",
-		"ankiConnectionSuccess": "Conexión con AnkiConnect activa (versión {version}).",
-		"ankiModelName": "Tipo de nota de Anki",
-		"ankiModelNameDesc": "Escribe el nombre exacto del tipo de nota en Anki, respetando su idioma y mayúsculas.",
-		"ankiModelNamePlaceholder": "Basic"
+		"ankiConnectionSuccess": "Conexión con AnkiConnect activa (versión {version})."
 	},
 	"help": {
 		"title": "Ayuda",
@@ -116,6 +112,7 @@
 	},
 	"errors": {
 		"invalidModelUrl": "La URL del modelo no es válida.",
+		"missingLlmModel": "Selecciona un modelo LLM antes de generar tarjetas.",
 		"server": "Error del servidor: {status}",
 		"generation": "Error en la generación: {status}",
 		"invalidJson": "No se pudo procesar la respuesta del modelo como un JSON válido.",
@@ -124,16 +121,18 @@
 		"invalidAnkiResponse": "AnkiConnect devolvió una respuesta no válida.",
 		"ankiConnection": "No se pudo conectar con AnkiConnect. Verifica que Anki esté abierto y AnkiConnect instalado.",
 		"invalidNoteFields": "Los campos y etiquetas de la nota de Anki deben contener valores de texto válidos.",
+		"partialAnkiCreation": "Se crearon {count} notas antes de que fallara el tipo \"{model}\": {error}",
 		"missingNoteId": "AnkiConnect no devolvió el identificador de la nota.",
 		"missingDeck": "Debes indicar un mazo de Anki.",
 		"missingModelName": "Debes indicar el nombre del tipo de nota de Anki.",
-		"modelNotFound": "Anki no encontró el tipo de nota \"{model}\". Revisa el nombre exacto en Anki.",
 		"missingModelFields": "El tipo de nota seleccionado no tiene al menos dos campos.",
 		"missingProviderUrl": "Debes indicar la URL del proveedor o elegir uno de la lista.",
+		"selectedFileUnavailable": "La nota seleccionada ya no está disponible: {file}",
 		"missingApiKey": "Añade la API Key antes de cargar modelos.",
 		"noModels": "No se encontraron modelos. Verifica la URL, el proveedor y la API Key.",
 		"modelsLoaded": "{count} modelos cargados con éxito.",
 		"modelsConnection": "Error de conexión al cargar modelos.",
+		"invalidModelsResponse": "El proveedor de modelos devolvió una respuesta de modelos no válida.",
 		"invalidCardCount": "La cantidad de tarjetas debe ser un número entero mayor que cero.",
 		"cardLimit": "La selección supera el límite de {count} tarjetas por ejecución."
 	}

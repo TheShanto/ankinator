@@ -11,6 +11,7 @@ export class AnkiCardsModal extends Modal {
 	private ankiModels: AnkiModel[] = [];
 	private selectedModelNames = new Set<string>();
 	private isSubmitting = false;
+	private isClosed = false;
 	private deckDropdown?: Setting;
 	private newDeckSetting?: Setting;
 
@@ -23,10 +24,12 @@ export class AnkiCardsModal extends Modal {
 	}
 
 	onOpen(): void {
+		this.isClosed = false;
 		void this.loadDecks();
 	}
 
 	onClose(): void {
+		this.isClosed = true;
 		this.contentEl.empty();
 	}
 
@@ -42,6 +45,10 @@ export class AnkiCardsModal extends Modal {
 				AnkiConnectApi.getDeckNames(url),
 				AnkiConnectApi.getModelNames(url),
 			]);
+			if (this.isClosed) {
+				return;
+			}
+
 			if (modelNames.length === 0) {
 				throw new Error(t('errors.noModels'));
 			}
@@ -49,10 +56,18 @@ export class AnkiCardsModal extends Modal {
 				name,
 				fieldNames: await AnkiConnectApi.getModelFieldNames(name, url),
 			})));
+			if (this.isClosed) {
+				return;
+			}
+
 			this.selectedModelNames.clear();
 			this.selectedDeck = decks[0] ?? NEW_DECK_VALUE;
 			this.render(decks);
 		} catch (error) {
+			if (this.isClosed) {
+				return;
+			}
+
 			const message = error instanceof Error ? error.message : t('modal.deckLoadError');
 			new Notice(message);
 			this.close();

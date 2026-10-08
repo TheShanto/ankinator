@@ -13,10 +13,6 @@ export interface Flashcard {
     modelName?: string;
 }
 
-interface ModelsResponse {
-    data?: unknown;
-}
-
 interface ChatCompletionResponse {
     choices?: Array<{
         message?: {
@@ -35,6 +31,9 @@ function parseFlashcards(content: string): Flashcard[] {
         const parsed: unknown = JSON.parse(normalizedContent);
         if (!Array.isArray(parsed)) {
             throw new Error('Expected an array of flashcards.');
+        }
+        if (parsed.length === 0) {
+            throw new Error('No flashcards were returned.');
         }
 
         return parsed.map((card): Flashcard => {
@@ -66,7 +65,8 @@ function parseFlashcards(content: string): Flashcard[] {
 
         const [modelNameRaw, question, answer] = columns;
         const modelName = modelNameRaw?.trim();
-        if (!modelName || !question?.trim() || (!answer?.trim() && modelName.toLowerCase() !== 'cloze')) {
+        const isClozeModel = modelName?.toLowerCase().includes('cloze') ?? false;
+        if (!modelName || !question?.trim() || (!answer?.trim() && !isClozeModel)) {
             throw new Error('Incomplete TSV flashcard row.');
         }
 
@@ -117,8 +117,17 @@ export class LLMConnector {
                 throw new Error(t('errors.server', { status: response.status }));
             }
 
-            const modelsData = (response.json as ModelsResponse).data;
-            if (!Array.isArray(modelsData)) return [];
+            const responseJson: unknown = response.json;
+            if (
+                typeof responseJson !== 'object' ||
+                responseJson === null ||
+                !('data' in responseJson) ||
+                !Array.isArray(responseJson.data)
+            ) {
+                throw new Error(t('errors.invalidModelsResponse'));
+            }
+
+            const modelsData = responseJson.data;
 
             return modelsData.flatMap((model): string[] => {
                 if (
@@ -133,7 +142,7 @@ export class LLMConnector {
             });
         } catch (error) {
             console.error('Error al obtener modelos del LLM:', error);
-            return [];
+            throw error instanceof Error ? error : new Error(t('errors.modelsConnection'));
         }
     }
 
@@ -144,6 +153,7 @@ export class LLMConnector {
         cardCount: number = 3,
         fieldNames: string[] = ['Front', 'Back'],
         ankiCardTypes: string[] = [],
+        ankiModelFields: Record<string, string[]> = {},
     ): Promise<Flashcard[]> {
         const cleanBaseUrl = settings.baseUrl.trim().replace(/\/+$/, '');
 
@@ -151,15 +161,27 @@ export class LLMConnector {
             throw new Error(t('errors.invalidModelUrl'));
         }
 
+        const resolvedModel = (modelName || settings.defaultModel).trim();
+        if (!resolvedModel) {
+            throw new Error(t('errors.missingLlmModel'));
+        }
+
         const language = getLanguage();
-        const systemPrompt = getLlmSystemPrompt(cardCount, language, language, fieldNames, ankiCardTypes);
+        const systemPrompt = getLlmSystemPrompt(
+            cardCount,
+            language,
+            language,
+            fieldNames,
+            ankiCardTypes,
+            ankiModelFields,
+        );
 
         const requestParams: RequestUrlParam = {
             url: `${cleanBaseUrl}/chat/completions`,
             method: 'POST',
             headers: this.buildHeaders(settings.apiKey),
             body: JSON.stringify({
-                model: modelName || settings.defaultModel,
+                model: resolvedModel,
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: text },
