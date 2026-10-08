@@ -15,8 +15,7 @@
 		"newDeckNamePlaceholder": "Nombre o ruta del mazo",
 		"model": "Tipo de nota",
 		"modelDesc": "Selecciona los tipos de nota que puede usar el LLM. Sus campos se cargan desde Anki.",
-		"fields": "Campos: {fields}",
-		"loadingModels": "Cargando tipos de nota..."
+		"fields": "Campos: {fields}"
 	},
 	"command": {
 		"createCards": "Crear tarjetas de Anki",
@@ -69,10 +68,7 @@
 		"ankiConnectUrlPlaceholder": "http://localhost:8765",
 		"testAnkiConnection": "Probar conexión",
 		"testingAnkiConnection": "Probando conexión...",
-		"ankiConnectionSuccess": "Conexión con AnkiConnect activa (versión {version}).",
-		"ankiModelName": "Tipo de nota de Anki",
-		"ankiModelNameDesc": "Escribe el nombre exacto del tipo de nota en Anki, respetando su idioma y mayúsculas.",
-		"ankiModelNamePlaceholder": "Basic"
+		"ankiConnectionSuccess": "Conexión con AnkiConnect activa (versión {version})."
 	},
 	"help": {
 		"title": "Ayuda",
@@ -129,7 +125,6 @@
 		"missingNoteId": "AnkiConnect no devolvió el identificador de la nota.",
 		"missingDeck": "Debes indicar un mazo de Anki.",
 		"missingModelName": "Debes indicar el nombre del tipo de nota de Anki.",
-		"modelNotFound": "Anki no encontró el tipo de nota \"{model}\". Revisa el nombre exacto en Anki.",
 		"missingModelFields": "El tipo de nota seleccionado no tiene al menos dos campos.",
 		"missingProviderUrl": "Debes indicar la URL del proveedor o elegir uno de la lista.",
 		"selectedFileUnavailable": "La nota seleccionada ya no está disponible: {file}",

@@ -86,7 +86,6 @@ export interface AnkiPluginSettings {
     apiKey: string;
     selectedModel: string;
     ankiConnectUrl: string;
-    defaultDeck: string;
 }
 
 export const DEFAULT_SETTINGS: AnkiPluginSettings = {
@@ -97,7 +96,6 @@ export const DEFAULT_SETTINGS: AnkiPluginSettings = {
     apiKey: '',
     selectedModel: '',
     ankiConnectUrl: DEFAULT_ANKI_CONNECT_SETTINGS.url,
-    defaultDeck: 'Default',
 };
 
 export class AnkiOpenCodeSettingTab extends PluginSettingTab {

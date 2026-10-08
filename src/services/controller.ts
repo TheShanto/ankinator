@@ -1,6 +1,6 @@
 import { MarkdownView, Notice, TFile } from 'obsidian';
 import type AnkiOpenCodePlugin from '../main';
-import { AnkiConnectApi } from './ankiConnectApi';
+import { AnkiConnectApi, DEFAULT_ANKI_CONNECT_SETTINGS } from './ankiConnectApi';
 import { LLMConnector, LLMSettings } from './llmApi';
 import { LLM_PROVIDERS } from '../settings';
 import { t } from '../i18n';
@@ -122,7 +122,7 @@ export class AnkiController {
 			try {
 				noteIds.push(...await AnkiConnectApi.addNotes(cardsForModel, {
 					url,
-					deckName: deckName ?? this.plugin.settings.defaultDeck,
+					deckName: deckName ?? DEFAULT_ANKI_CONNECT_SETTINGS.deckName,
 					modelName: cardModelName,
 					fieldNames: modelFields.get(cardModelName) ?? [],
 				}));

@@ -87,8 +87,5 @@ function normalizeSettings(value: unknown): AnkiPluginSettings {
         ankiConnectUrl: typeof saved.ankiConnectUrl === 'string'
             ? saved.ankiConnectUrl
             : DEFAULT_SETTINGS.ankiConnectUrl,
-        defaultDeck: typeof saved.defaultDeck === 'string'
-            ? saved.defaultDeck
-            : DEFAULT_SETTINGS.defaultDeck,
     };
 }

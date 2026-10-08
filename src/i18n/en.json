@@ -15,8 +15,7 @@
 		"newDeckNamePlaceholder": "Deck name or path",
 		"model": "Note type",
 		"modelDesc": "Select the note types that the LLM may use. Their fields are loaded from Anki.",
-		"fields": "Fields: {fields}",
-		"loadingModels": "Loading note types..."
+		"fields": "Fields: {fields}"
 	},
 	"command": {
 		"createCards": "Create Anki cards",
@@ -69,10 +68,7 @@
 		"ankiConnectUrlPlaceholder": "http://localhost:8765",
 		"testAnkiConnection": "Test connection",
 		"testingAnkiConnection": "Testing connection...",
-		"ankiConnectionSuccess": "AnkiConnect connection is active (version {version}).",
-		"ankiModelName": "Anki note type",
-		"ankiModelNameDesc": "Enter the exact note type name from Anki, including its language and capitalization.",
-		"ankiModelNamePlaceholder": "Basic"
+		"ankiConnectionSuccess": "AnkiConnect connection is active (version {version})."
 	},
 	"help": {
 		"title": "Help",
@@ -129,7 +125,6 @@
 		"missingNoteId": "AnkiConnect did not return the note identifier.",
 		"missingDeck": "You must specify an Anki deck.",
 		"missingModelName": "You must specify the Anki note type name.",
-		"modelNotFound": "Anki could not find the note type \"{model}\". Check the exact name in Anki.",
 		"missingModelFields": "The selected note type does not have at least two fields.",
 		"missingProviderUrl": "Enter the provider URL or choose one from the list.",
 		"selectedFileUnavailable": "The selected note is no longer available: {file}",
