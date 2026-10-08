@@ -151,6 +151,11 @@ export class LLMConnector {
             throw new Error(t('errors.invalidModelUrl'));
         }
 
+        const resolvedModel = (modelName || settings.defaultModel).trim();
+        if (!resolvedModel) {
+            throw new Error(t('errors.missingLlmModel'));
+        }
+
         const language = getLanguage();
         const systemPrompt = getLlmSystemPrompt(cardCount, language, language, fieldNames, ankiCardTypes);
 
@@ -159,7 +164,7 @@ export class LLMConnector {
             method: 'POST',
             headers: this.buildHeaders(settings.apiKey),
             body: JSON.stringify({
-                model: modelName || settings.defaultModel,
+                model: resolvedModel,
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: text },

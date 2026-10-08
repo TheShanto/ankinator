@@ -116,6 +116,7 @@
 	},
 	"errors": {
 		"invalidModelUrl": "The model URL is not valid.",
+		"missingLlmModel": "Select an LLM model before generating cards.",
 		"server": "Server error: {status}",
 		"generation": "Generation error: {status}",
 		"invalidJson": "The model response could not be processed as valid JSON.",
