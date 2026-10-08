@@ -125,6 +125,7 @@
 		"invalidAnkiResponse": "AnkiConnect devolvió una respuesta no válida.",
 		"ankiConnection": "No se pudo conectar con AnkiConnect. Verifica que Anki esté abierto y AnkiConnect instalado.",
 		"invalidNoteFields": "Los campos y etiquetas de la nota de Anki deben contener valores de texto válidos.",
+		"partialAnkiCreation": "Se crearon {count} notas antes de que fallara el tipo \"{model}\": {error}",
 		"missingNoteId": "AnkiConnect no devolvió el identificador de la nota.",
 		"missingDeck": "Debes indicar un mazo de Anki.",
 		"missingModelName": "Debes indicar el nombre del tipo de nota de Anki.",

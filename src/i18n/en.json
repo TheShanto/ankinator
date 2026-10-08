@@ -125,6 +125,7 @@
 		"invalidAnkiResponse": "AnkiConnect returned an invalid response.",
 		"ankiConnection": "Could not connect to AnkiConnect. Make sure Anki is open and AnkiConnect is installed.",
 		"invalidNoteFields": "Anki note fields and tags must contain valid text values.",
+		"partialAnkiCreation": "{count} notes were created before note type \"{model}\" failed: {error}",
 		"missingNoteId": "AnkiConnect did not return the note identifier.",
 		"missingDeck": "You must specify an Anki deck.",
 		"missingModelName": "You must specify the Anki note type name.",

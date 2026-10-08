@@ -119,12 +119,25 @@ export class AnkiController {
 				return [];
 			}
 
-			noteIds.push(...await AnkiConnectApi.addNotes(cardsForModel, {
-				url,
-				deckName: deckName ?? this.plugin.settings.defaultDeck,
-				modelName: cardModelName,
-				fieldNames: modelFields.get(cardModelName) ?? [],
-			}));
+			try {
+				noteIds.push(...await AnkiConnectApi.addNotes(cardsForModel, {
+					url,
+					deckName: deckName ?? this.plugin.settings.defaultDeck,
+					modelName: cardModelName,
+					fieldNames: modelFields.get(cardModelName) ?? [],
+				}));
+			} catch (error) {
+				if (noteIds.length > 0) {
+					const message = error instanceof Error ? error.message : t('errors.ankiConnection');
+					throw new Error(t('errors.partialAnkiCreation', {
+						count: noteIds.length,
+						model: cardModelName,
+						error: message,
+					}));
+				}
+
+				throw error;
+			}
 		}
 
 		if (this.plugin.isUnloaded()) {
