@@ -36,6 +36,9 @@ function parseFlashcards(content: string): Flashcard[] {
         if (!Array.isArray(parsed)) {
             throw new Error('Expected an array of flashcards.');
         }
+        if (parsed.length === 0) {
+            throw new Error('No flashcards were returned.');
+        }
 
         return parsed.map((card): Flashcard => {
             if (
