@@ -59,7 +59,10 @@ Obsidian note -> LLM generation -> flashcards -> AnkiConnect -> Anki
 ├── src/
 │   ├── main.ts                 # Plugin entry point
 │   ├── settings.ts             # Plugin settings and configuration
-│   ├── i18n.ts                 # Internationalized strings
+│   ├── i18n/
+│   │   ├── index.ts            # i18n runtime, key types, prompt builder
+│   │   ├── en.json             # English strings (reference language)
+│   │   └── es.json             # Spanish strings
 │   ├── services/
 │   │   ├── ankiConnectApi.ts    # AnkiConnect integration
 │   │   ├── controller.ts        # Card creation logic
@@ -67,10 +70,13 @@ Obsidian note -> LLM generation -> flashcards -> AnkiConnect -> Anki
 │   └── ui/
 │       ├── modal.ts             # Main modal for creating cards
 │       └── noteSelectionModal.ts
+├── tests/
+│   └── i18n.test.mjs            # Translation verification suite
 ├── manifest.json
 ├── package.json
 ├── LICENSE
 ├── README.md
+├── TRANSLATIONS.md             # Translation guide
 ├── esbuild.config.mjs
 └── styles.css
 ```
@@ -108,12 +114,46 @@ Lint:
 npm run lint
 ```
 
+Tests:
+
+```bash
+npm test
+```
+
 ### Manual testing
 
 1. Build the plugin with `npm run build`.
 2. Copy `main.js`, `manifest.json`, and `styles.css` into the plugin folder in your Obsidian vault.
 3. Restart Obsidian and enable the plugin from **Settings → Community plugins**.
 4. Open a note and run the plugin command.
+
+## Translations
+
+Ankinator ships with English and Spanish, following Obsidian's language setting. All user-facing strings live in `src/i18n/en.json` and `src/i18n/es.json` and are read through `t()`.
+
+- To change or add text, edit the JSON files and reference the key with `t()` in code.
+- To add a language, copy `en.json`, translate it, and register it in `src/i18n/index.ts`.
+- Run `npm test` to verify key parity, matching placeholders, and that no UI string is hardcoded.
+
+See [TRANSLATIONS.md](./TRANSLATIONS.md) for the full guide.
+
+## Versioning and releases
+
+The plugin version must stay in sync across three files:
+
+- `package.json` — the npm package version.
+- `manifest.json` — the version Obsidian reads; the release tag must match it exactly (no leading `v`).
+- `versions.json` — maps each plugin version to the minimum app version.
+
+Bump all three at once with npm, which also commits the change and creates the tag:
+
+```bash
+npm version <major|minor|patch>
+```
+
+This updates `package.json`, runs `version-bump.mjs` to update `manifest.json` and `versions.json`, and creates a tag without a prefix (see `.npmrc`). Push the commit and the tag; the release workflow builds the plugin and attaches `main.js`, `manifest.json`, and `styles.css`.
+
+Never edit `manifest.json` by hand without bumping `package.json` (and vice versa): they must always be equal.
 
 ## Contributing
 
