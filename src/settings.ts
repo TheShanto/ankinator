@@ -2,7 +2,7 @@ import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
 import AnkiOpenCodePlugin from './main';
 import { AnkiConnectApi, DEFAULT_ANKI_CONNECT_SETTINGS } from './services/ankiConnectApi';
 import { LLMConnector } from './services/llmApi';
-import { t } from './i18n';
+import { t, type TranslationKey } from './i18n';
 
 export const LLM_PROVIDERS: Record<string, { baseUrl: string }> = {
     openai: { baseUrl: 'https://api.openai.com/v1' },
@@ -111,7 +111,8 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     Object.entries(LLM_PROVIDERS).forEach(([providerId, option]) => {
                         drop.addOption(providerId, providerId === 'custom'
                             ? t('settings.customProvider')
-                            : t(`providers.${providerId}`));
+                            // providerId comes from the LLM_PROVIDERS keys, which mirror the `providers` translations.
+                            : t(`providers.${providerId}` as TranslationKey));
                     });
 
                     drop.setValue(this.plugin.settings.providerId)
