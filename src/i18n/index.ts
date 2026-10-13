@@ -79,16 +79,16 @@ export function getLlmSystemPrompt(
 
 	const prompts = {
 		en: {
-			role: 'You are an expert at creating high-quality Anki cards from programming-related text provided by the user.',
+			role: 'You are an expert at creating high-quality Anki cards from the text provided by the user.',
 			instructions: `## Principles
 
 1. **Atomicity**: each card tests ONE piece of information or idea. If an answer contains "and" or a list, split it.
 2. **Minimum information**: formulate the question and answer as simply as possible without losing precision. Answers of 1 to 5 words whenever possible.
-3. **Self-contained**: the question must be understandable without seeing the original text. Name the subject explicitly ("What does \`Array.prototype.map\` return?", never "What does it return?").
+3. **Self-contained**: the question must be understandable without seeing the original text. Name the subject explicitly ("What year was the Treaty of Versailles signed?", never "What year was it signed?").
 4. **No clues in the question**: do not include the answer or words that give it away.
 5. **Understanding over literal memorization**: for causal relationships, ask "why?" or "what causes X?" instead of isolated facts.
 6. **Faithfulness**: use the exact data from the text. Do not invent or add information that is not in the text.
-7. **Code formatting**: wrap identifiers, keywords, operators and short snippets in backticks (\`like this\`). Keep snippets to one line whenever possible.
+7. **Formatting**: if the content includes code, wrap identifiers, keywords, operators and short snippets in backticks (\`like this\`), keeping each snippet on a single line whenever possible. Do not add formatting that the source text does not support.
 
 ## Valid Anki note types
 
@@ -98,7 +98,7 @@ ${ankiMetadata}
 
 Choose one of these exact names for every card. Do not invent, translate, or rename them.
 
-Choose the most appropriate note type for each card. Use a cloze note type (if one is listed) for sentences or code where context matters (syntax, ordered steps, keywords in context), and the other note types for facts, definitions, behaviors and causes.
+Choose the most appropriate note type for each card. Use a cloze note type (if one is listed) for sentences where context matters (dates, ordered steps, terms in context), and the other note types for facts, definitions, behaviors and causes.
 
 ## What NOT to do
 
@@ -123,28 +123,27 @@ Rules:
 
 The note type names in this example are illustrative. In your output, always use the exact note type names listed above.
 
-Input text: "Array.prototype.map returns a new array with the results of calling a function on every element. It does not mutate the original array. The strict equality operator === compares values without type coercion, while == coerces types before comparing. Declaring a variable with const prevents reassignment of the binding. An async function always returns a Promise."
+Input text: "Photosynthesis converts light energy into chemical energy stored in glucose. The mitochondrion produces most of the cell's ATP through cellular respiration. The Treaty of Versailles, signed in 1919, formally ended World War I. In Spanish, the verb 'ser' is used for permanent states, while 'estar' is used for temporary conditions."
 
 Output:
-Basic	What does \`Array.prototype.map\` return?	A new array
-Basic	Does \`Array.prototype.map\` mutate the original array?	No
-Basic	What does \`===\` do differently from \`==\` in JavaScript?	Compares without type coercion
-Cloze	Declaring a variable with {{c1::\`const\`}} prevents reassignment of the binding.	
-Basic	What does an \`async\` function always return?	A \`Promise\``,
-			language: `Write the questions and answers in ${noteLanguage === 'es' ? 'Spanish' : 'English'}. Keep code, identifiers and technical keywords exactly as they are.`,
+Basic	What does photosynthesis convert light energy into?	Chemical energy stored in glucose
+Basic	Which organelle produces most of the cell's ATP?	The mitochondrion
+Cloze	The Treaty of Versailles was signed in {{c1::1919}}.	
+Basic	In Spanish, when is the verb 'ser' used?	For permanent states`,
+			language: `Write the questions and answers in ${noteLanguage === 'es' ? 'Spanish' : 'English'}. Keep proper nouns, terminology and technical keywords exactly as they are, without translating them.`,
 			task: `Generate exactly ${cardCount} high-quality cards from the text provided in the next message. If the text does not support that many good cards, generate fewer rather than inventing filler.`,
 		},
 		es: {
-			role: 'Eres un experto en crear tarjetas Anki de alta calidad a partir de texto de programación proporcionado por el usuario.',
+			role: 'Eres un experto en crear tarjetas Anki de alta calidad a partir del texto proporcionado por el usuario.',
 			instructions: `## Principios
 
 1. **Atomicidad**: cada tarjeta prueba UN solo dato o idea. Si una respuesta tiene "y" o una lista, divídela.
 2. **Mínima información**: formula la pregunta y respuesta de la forma más simple posible sin perder precisión. Respuestas de 1 a 5 palabras cuando sea posible.
-3. **Autosuficiencia**: la pregunta debe entenderse sin ver el texto original. Nombra el sujeto explícitamente ("¿Qué devuelve \`Array.prototype.map\`?", nunca "¿Qué devuelve?").
+3. **Autosuficiencia**: la pregunta debe entenderse sin ver el texto original. Nombra el sujeto explícitamente ("¿En qué año se firmó el Tratado de Versalles?", nunca "¿En qué año se firmó?").
 4. **Sin pistas en la pregunta**: no incluyas la respuesta ni palabras que la delaten.
 5. **Comprensión sobre memorización literal**: para relaciones causales, pregunta "¿por qué?" o "¿qué causa X?" en vez de solo hechos aislados.
 6. **Fidelidad**: usa los datos exactos del texto. No inventes ni añadas información que no esté en el texto.
-7. **Formato de código**: encierra identificadores, palabras clave, operadores y fragmentos cortos entre backticks (\`así\`). Mantén los fragmentos en una sola línea siempre que sea posible.
+7. **Formato**: si el contenido incluye código, encierra identificadores, palabras clave, operadores y fragmentos cortos entre backticks (\`así\`), manteniendo cada fragmento en una sola línea siempre que sea posible. No añadas formato que el texto de origen no respalde.
 
 ## Tipos de nota válidos de Anki
 
@@ -154,7 +153,7 @@ ${ankiMetadata}
 
 Elige uno de estos nombres exactos para cada tarjeta. No inventes, no traduzcas ni renombres ninguno.
 
-Elige el tipo de nota más adecuado para cada tarjeta. Usa un tipo de nota cloze (si hay alguno en la lista) para frases o código donde el contexto importa (sintaxis, pasos ordenados, palabras clave en contexto), y los demás tipos para hechos, definiciones, comportamientos y causas.
+Elige el tipo de nota más adecuado para cada tarjeta. Usa un tipo de nota cloze (si hay alguno en la lista) para frases donde el contexto importa (fechas, pasos ordenados, términos en contexto), y los demás tipos para hechos, definiciones, comportamientos y causas.
 
 ## Qué NO hacer
 
@@ -179,15 +178,14 @@ Reglas:
 
 Los nombres de tipo de nota de este ejemplo son ilustrativos. En tu salida, usa siempre los nombres exactos de tipo de nota listados arriba.
 
-Texto de entrada: "Array.prototype.map devuelve un nuevo array con el resultado de llamar a una función en cada elemento. No modifica el array original. El operador de igualdad estricta === compara valores sin coerción de tipos, mientras que == convierte los tipos antes de comparar. Declarar una variable con const impide reasignar el binding. Una función async siempre devuelve una Promise."
+Texto de entrada: "La fotosíntesis convierte la energía luminosa en energía química almacenada en glucosa. La mitocondria produce la mayor parte del ATP de la célula mediante la respiración celular. El Tratado de Versalles, firmado en 1919, puso fin formalmente a la Primera Guerra Mundial. En español, el verbo «ser» se usa para estados permanentes, mientras que «estar» se usa para condiciones temporales."
 
 Salida:
-Basic	¿Qué devuelve \`Array.prototype.map\`?	Un nuevo array
-Basic	¿\`Array.prototype.map\` modifica el array original?	No
-Basic	¿Qué hace \`===\` de distinto a \`==\` en JavaScript?	Compara sin coerción de tipos
-Cloze	Declarar una variable con {{c1::\`const\`}} impide reasignar el binding.	
-Basic	¿Qué devuelve siempre una función \`async\`?	Una \`Promise\``,
-			language: `Escribe las preguntas y respuestas en ${noteLanguage === 'es' ? 'español' : 'inglés'}. Mantén nombres de código, identificadores y palabras técnicas exactamente como aparecen.`,
+Basic	¿En qué convierte la fotosíntesis la energía luminosa?	En energía química almacenada en glucosa
+Basic	¿Qué orgánulo produce la mayor parte del ATP de la célula?	La mitocondria
+Cloze	El Tratado de Versalles se firmó en {{c1::1919}}.	
+Basic	En español, ¿cuándo se usa el verbo «ser»?	Para estados permanentes`,
+			language: `Escribe las preguntas y respuestas en ${noteLanguage === 'es' ? 'español' : 'inglés'}. Mantén los nombres propios, la terminología y las palabras técnicas exactamente como aparecen, sin traducirlos.`,
 			task: `Genera exactamente ${cardCount} tarjetas de alta calidad a partir del texto proporcionado en el siguiente mensaje. Si el texto no soporta tantas tarjetas útiles, genera menos, pero no inventes contenido.`,
 		},
 	} as const;
