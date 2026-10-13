@@ -1,6 +1,6 @@
 {
 	"name": "ankinator",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "Create easy Anki-Cards directly into Obsidian, using LLM Models",
 	"main": "main.js",
 	"type": "module",
