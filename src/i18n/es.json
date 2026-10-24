@@ -37,7 +37,21 @@
 		"success": "{count} tarjetas enviadas a Anki.",
 		"emptyNote": "La nota activa y la selección están vacías.",
 		"noActiveFile": "No hay una nota Markdown activa.",
-		"noCards": "El LLM no devolvió tarjetas para enviar a Anki."
+		"noCards": "El LLM no devolvió tarjetas para enviar a Anki.",
+		"activeNote": "Nota activa"
+	},
+	"results": {
+		"title": "Resultados de creación de tarjetas",
+		"summary": "{created} de {total} tarjetas confirmadas en Anki.",
+		"sourceCount": " · {created}/{total}",
+		"errorCount": "{count} tarjetas: {message}",
+		"retry": "Reintentar tarjetas pendientes",
+		"retrying": "Reintentando...",
+		"status": {
+			"created": "Creada",
+			"failed": "No creada",
+			"uncertain": "Sin confirmar"
+		}
 	},
 	"settings": {
 		"title": "Configuración del Motor LLM",
@@ -121,7 +135,6 @@
 		"invalidAnkiResponse": "AnkiConnect devolvió una respuesta no válida.",
 		"ankiConnection": "No se pudo conectar con AnkiConnect. Verifica que Anki esté abierto y AnkiConnect instalado.",
 		"invalidNoteFields": "Los campos y etiquetas de la nota de Anki deben contener valores de texto válidos.",
-		"partialAnkiCreation": "Se crearon {count} notas antes de que fallara el tipo \"{model}\": {error}",
 		"missingNoteId": "AnkiConnect no devolvió el identificador de la nota.",
 		"missingDeck": "Debes indicar un mazo de Anki.",
 		"missingModelName": "Debes indicar el nombre del tipo de nota de Anki.",
@@ -134,6 +147,9 @@
 		"modelsConnection": "Error de conexión al cargar modelos.",
 		"invalidModelsResponse": "El proveedor de modelos devolvió una respuesta de modelos no válida.",
 		"invalidCardCount": "La cantidad de tarjetas debe ser un número entero mayor que cero.",
-		"cardLimit": "La selección supera el límite de {count} tarjetas por ejecución."
+		"cardLimit": "La selección supera el límite de {count} tarjetas por ejecución.",
+		"notSent": "Aún no enviada.",
+		"cardNotAdded": "Anki no añadió esta tarjeta.",
+		"verificationFailed": "No se pudo verificar si esta tarjeta existe en Anki."
 	}
 }

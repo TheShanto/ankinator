@@ -1,6 +1,7 @@
 import { App, Modal, Notice, Setting, TFile } from 'obsidian';
 import { AnkiConnectApi } from '../services/ankiConnectApi';
 import { AnkiController, AnkiModel } from '../services/controller';
+import { CardResultModal } from './cardResultModal';
 import { t } from '../i18n';
 
 const NEW_DECK_VALUE = '__new_deck__';
@@ -178,12 +179,19 @@ export class AnkiCardsModal extends Modal {
 			}
 
 			this.close();
-			await this.controller.createCards({
+			const operation = await this.controller.createCards({
 				cardCount: this.cardCount,
 				files: this.files,
 				deckName,
 				ankiModels: selectedModels,
 			});
+			if (!operation) return;
+			const createdCount = operation.cards.filter((item) => item.status === 'created').length;
+			if (createdCount === operation.cards.length) {
+				new Notice(t('notices.success', { count: createdCount }));
+			} else {
+				new CardResultModal(this.app, this.controller, operation).open();
+			}
 		} catch (error) {
 			const message = error instanceof Error ? error.message : t('modal.generationError');
 			new Notice(message);

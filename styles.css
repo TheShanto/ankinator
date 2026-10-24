@@ -1,8 +1,71 @@
-/*
+.ankinator-result-summary {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5em;
+	margin-bottom: 1em;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.ankinator-result-status {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25em;
+	padding: 0.1em 0.3em;
+	font-size: var(--font-smaller);
+	font-weight: 600;
+	line-height: 1.5;
+}
 
-If your plugin does not need CSS, delete this file.
+.ankinator-result-status.is-created {
+	color: var(--text-accent);
+}
 
-*/
+.ankinator-result-status.is-failed {
+	color: var(--text-error);
+}
+
+.ankinator-result-status.is-uncertain {
+	color: var(--text-warning);
+}
+
+.ankinator-result-icon {
+	display: inline-flex;
+	width: 1.15em;
+	height: 1.15em;
+}
+
+.ankinator-result-icon svg {
+	width: 100%;
+	height: 100%;
+}
+
+.ankinator-result-count {
+	color: var(--text-muted);
+}
+
+.ankinator-result-source {
+	display: inline-block;
+	max-width: min(70vw, 42rem);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.ankinator-result-error {
+	color: var(--text-muted);
+	font-size: var(--font-smaller);
+}
+
+.ankinator-result-question {
+	margin-left: 0.5em;
+	white-space: pre-wrap;
+}
+
+.modal .ankinator-result-status + .ankinator-result-question {
+	display: inline;
+}
+
+.modal details > summary .ankinator-result-status {
+	margin-left: 0.5em;
+}

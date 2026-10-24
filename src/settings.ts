@@ -2,7 +2,7 @@ import { App, Modal, Notice, PluginSettingTab, Setting } from 'obsidian';
 import AnkiOpenCodePlugin from './main';
 import { AnkiConnectApi, DEFAULT_ANKI_CONNECT_SETTINGS } from './services/ankiConnectApi';
 import { LLMConnector } from './services/llmApi';
-import { t } from './i18n';
+import { t, type TranslationKey } from './i18n';
 
 class HelpModal extends Modal {
     constructor(
@@ -177,7 +177,8 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     Object.entries(LLM_PROVIDERS).forEach(([providerId, option]) => {
                         drop.addOption(providerId, providerId === 'custom'
                             ? t('settings.customProvider')
-                            : t(`providers.${providerId}`));
+                            // providerId comes from the LLM_PROVIDERS keys, which mirror the `providers` translations.
+                            : t(`providers.${providerId}` as TranslationKey));
                     });
 
                     drop.setValue(this.plugin.settings.providerId)
@@ -294,7 +295,7 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
             .setName(t('help.apiKey.label'))
             .setDesc(t('help.apiKey.description'))
             .addButton((button) => button
-                .setButtonText('?')
+                .setButtonText(t('help.open'))
                 .setTooltip(t('help.open'))
                 .onClick(() => {
                     new HelpModal(this.app, 'apiKey').open();
@@ -304,7 +305,7 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
             .setName(t('help.anki.label'))
             .setDesc(t('help.anki.description'))
             .addButton((button) => button
-                .setButtonText('?')
+                .setButtonText(t('help.open'))
                 .setTooltip(t('help.open'))
                 .onClick(() => {
                     new HelpModal(this.app, 'anki').open();

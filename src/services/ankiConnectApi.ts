@@ -55,6 +55,24 @@ export class AnkiConnectApi {
 		return this.request<string[]>('modelFieldNames', { modelName }, url);
 	}
 
+	static async findMatchingNote(
+		fields: Record<string, string>,
+		settings: Pick<AnkiConnectSettings, 'url' | 'deckName' | 'modelName'>,
+	): Promise<boolean> {
+		const escapeSearchValue = (value: string) => value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+		const query = `deck:"${escapeSearchValue(settings.deckName)}" note:"${escapeSearchValue(settings.modelName)}"`;
+		const noteIds = await this.request<number[]>('findNotes', { query }, settings.url);
+		if (noteIds.length === 0) return false;
+
+		const notes = await this.request<Array<{
+			modelName: string;
+			fields: Record<string, { value: string }>;
+		}>>('notesInfo', { notes: noteIds }, settings.url);
+
+		return notes.some((note) => note.modelName === settings.modelName &&
+			Object.entries(fields).every(([name, value]) => note.fields[name]?.value === value));
+	}
+
 	static async createDeck(
 		deckName: string,
 		url: string = DEFAULT_ANKI_CONNECT_SETTINGS.url,
@@ -172,7 +190,7 @@ export class AnkiConnectApi {
 
 		if (action === 'addNotes' && (
 			!Array.isArray(result) ||
-			result.some((noteId) => typeof noteId !== 'number' || !Number.isSafeInteger(noteId))
+			result.some((noteId) => noteId !== null && (typeof noteId !== 'number' || !Number.isSafeInteger(noteId)))
 		)) {
 			throw new Error(`AnkiConnect: ${t('errors.invalidAnkiResponse')}`);
 		}
@@ -187,7 +205,7 @@ export class AnkiConnectApi {
 		const noteIds = await this.addNotes([note], settings);
 		const noteId = noteIds[0];
 
-		if (noteId === undefined) {
+		if (typeof noteId !== 'number') {
 			throw new Error(t('errors.missingNoteId'));
 		}
 
@@ -197,7 +215,7 @@ export class AnkiConnectApi {
 	static async addNotes(
 		notes: Array<AnkiNote | Flashcard>,
 		settings: AnkiConnectSettings = DEFAULT_ANKI_CONNECT_SETTINGS,
-	): Promise<number[]> {
+	): Promise<Array<number | null>> {
 		if (notes.length === 0) {
 			return [];
 		}
@@ -255,8 +273,12 @@ export class AnkiConnectApi {
 			};
 		});
 
-		return this.request<number[]>('addNotes', {
+		const noteIds = await this.request<Array<number | null>>('addNotes', {
 			notes: payloadNotes,
 		}, settings.url);
+		if (noteIds.length !== notes.length) {
+			throw new Error(`AnkiConnect: ${t('errors.invalidAnkiResponse')}`);
+		}
+		return noteIds;
 	}
 }

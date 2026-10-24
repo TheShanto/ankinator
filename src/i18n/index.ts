@@ -3,7 +3,17 @@ import en from './en.json';
 import es from './es.json';
 
 export type Language = 'en' | 'es';
-export type TranslationKey = string;
+
+type LeafKeys<T> = {
+	[K in keyof T & string]: T[K] extends string
+		? K
+		: T[K] extends Record<string, unknown>
+			? `${K}.${LeafKeys<T[K]>}`
+			: never;
+}[keyof T & string];
+
+// The reference language (Spanish is checked against it by the i18n tests).
+export type TranslationKey = LeafKeys<typeof en>;
 export type InterpolationValues = Record<string, string | number>;
 
 export const translations = {
