@@ -1,8 +1,72 @@
-import { App, Notice, PluginSettingTab, Setting } from 'obsidian';
+import { App, Modal, Notice, PluginSettingTab, Setting } from 'obsidian';
 import AnkiOpenCodePlugin from './main';
 import { AnkiConnectApi, DEFAULT_ANKI_CONNECT_SETTINGS } from './services/ankiConnectApi';
 import { LLMConnector } from './services/llmApi';
 import { t, type TranslationKey } from './i18n';
+
+class HelpModal extends Modal {
+    constructor(
+        app: App,
+        private readonly topic: 'apiKey' | 'anki',
+    ) {
+        super(app);
+    }
+
+    onOpen(): void {
+        const { contentEl } = this;
+        contentEl.empty();
+
+        if (this.topic === 'apiKey') {
+            this.renderApiKeyHelp(contentEl);
+        } else {
+            this.renderAnkiHelp(contentEl);
+        }
+    }
+
+    onClose(): void {
+        this.contentEl.empty();
+    }
+
+    private renderApiKeyHelp(containerEl: HTMLElement): void {
+        containerEl.createEl('h2', { text: t('help.apiKey.title') });
+        containerEl.createEl('p', { text: t('help.apiKey.intro') });
+
+        const providers = [
+            'openai',
+            'openrouter',
+            'groq',
+            'together',
+            'deepseek',
+            'mistral',
+        ] as const;
+        const providerList = containerEl.createEl('ul');
+
+        providers.forEach((provider) => {
+            providerList.createEl('li', { text: t(`help.apiKey.providers.${provider}`) });
+        });
+
+        containerEl.createEl('p', { text: t('help.apiKey.finalStep') });
+    }
+
+    private renderAnkiHelp(containerEl: HTMLElement): void {
+        containerEl.createEl('h2', { text: t('help.anki.title') });
+        containerEl.createEl('p', { text: t('help.anki.intro') });
+
+        const steps = [
+            'download',
+            'plugin',
+            'restart',
+            'configure',
+        ] as const;
+        const stepList = containerEl.createEl('ol');
+
+        steps.forEach((step) => {
+            stepList.createEl('li', { text: t(`help.anki.steps.${step}`) });
+        });
+
+        containerEl.createEl('p', { text: t('help.anki.finalStep') });
+    }
+}
 
 export const LLM_PROVIDERS: Record<string, { baseUrl: string }> = {
     openai: { baseUrl: 'https://api.openai.com/v1' },
@@ -22,7 +86,6 @@ export interface AnkiPluginSettings {
     apiKey: string;
     selectedModel: string;
     ankiConnectUrl: string;
-    defaultDeck: string;
 }
 
 export const DEFAULT_SETTINGS: AnkiPluginSettings = {
@@ -33,7 +96,6 @@ export const DEFAULT_SETTINGS: AnkiPluginSettings = {
     apiKey: '',
     selectedModel: '',
     ankiConnectUrl: DEFAULT_ANKI_CONNECT_SETTINGS.url,
-    defaultDeck: 'Default',
 };
 
 export class AnkiOpenCodeSettingTab extends PluginSettingTab {
@@ -41,6 +103,7 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
     availableModels: string[] = [];
     isFetchingModels = false;
     isTestingAnkiConnection = false;
+    private modelsRequestGeneration = 0;
 
     constructor(app: App, plugin: AnkiOpenCodePlugin) {
         super(app, plugin);
@@ -86,6 +149,7 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                 .onChange((value) => {
                     const nextMode = value === 'provider' ? 'provider' : 'local';
                     this.plugin.settings.llmMode = nextMode;
+                    this.modelsRequestGeneration++;
                     this.availableModels = [];
                     this.plugin.settings.selectedModel = '';
                     void this.plugin.saveSettings();
@@ -101,6 +165,8 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.settings.localUrl)
                     .onChange((value) => {
                         this.plugin.settings.localUrl = value.trim();
+                        this.modelsRequestGeneration++;
+                        this.availableModels = [];
                         void this.plugin.saveSettings();
                     }));
         } else {
@@ -118,6 +184,7 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     drop.setValue(this.plugin.settings.providerId)
                         .onChange((value) => {
                             this.plugin.settings.providerId = value;
+                            this.modelsRequestGeneration++;
                             this.availableModels = [];
                             this.plugin.settings.selectedModel = '';
                             void this.plugin.saveSettings();
@@ -134,6 +201,8 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                         .setValue(this.plugin.settings.customProviderUrl)
                         .onChange(async (value) => {
                             this.plugin.settings.customProviderUrl = value.trim();
+                            this.modelsRequestGeneration++;
+                            this.availableModels = [];
                             await this.plugin.saveSettings();
                         }));
             }
@@ -147,6 +216,8 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                     text.inputEl.type = 'password';
                     text.onChange((value) => {
                         this.plugin.settings.apiKey = value.trim();
+                        this.modelsRequestGeneration++;
+                        this.availableModels = [];
                         void this.plugin.saveSettings();
                     });
                 });
@@ -214,21 +285,50 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
             .onClick(() => {
                 void this.testAnkiConnection();
             }));
+
+        containerEl.createEl('hr');
+        new Setting(containerEl)
+            .setName(t('help.title'))
+            .setHeading();
+
+        new Setting(containerEl)
+            .setName(t('help.apiKey.label'))
+            .setDesc(t('help.apiKey.description'))
+            .addButton((button) => button
+                .setButtonText(t('help.open'))
+                .setTooltip(t('help.open'))
+                .onClick(() => {
+                    new HelpModal(this.app, 'apiKey').open();
+                }));
+
+        new Setting(containerEl)
+            .setName(t('help.anki.label'))
+            .setDesc(t('help.anki.description'))
+            .addButton((button) => button
+                .setButtonText(t('help.open'))
+                .setTooltip(t('help.open'))
+                .onClick(() => {
+                    new HelpModal(this.app, 'anki').open();
+                }));
     }
 
     private async loadAvailableModels(): Promise<void> {
+            const requestGeneration = ++this.modelsRequestGeneration;
+            const requestMode = this.plugin.settings.llmMode;
+            const requestUrl = this.getCurrentBaseUrl();
+            const requestKey = requestMode === 'local' ? '' : this.plugin.settings.apiKey.trim();
             this.isFetchingModels = true;
             this.display();
 
                 try {
-                    const currentUrl = this.getCurrentBaseUrl();
-                    const currentKey = this.plugin.settings.llmMode === 'local' ? '' : this.plugin.settings.apiKey.trim();
+                    const currentUrl = requestUrl;
+                    const currentKey = requestKey;
 
-                    if (this.plugin.settings.llmMode !== 'local' && !currentUrl) {
+                    if (requestMode !== 'local' && !currentUrl) {
                         throw new Error(t('errors.missingProviderUrl'));
                     }
 
-                    if (this.plugin.settings.llmMode !== 'local' && !currentKey) {
+                    if (requestMode !== 'local' && !currentKey) {
                         throw new Error(t('errors.missingApiKey'));
                     }
 
@@ -238,17 +338,34 @@ export class AnkiOpenCodeSettingTab extends PluginSettingTab {
                         defaultModel: this.plugin.settings.selectedModel,
                     });
 
+                    if (
+                        requestGeneration !== this.modelsRequestGeneration ||
+                        requestMode !== this.plugin.settings.llmMode ||
+                        requestUrl !== this.getCurrentBaseUrl() ||
+                        requestKey !== (this.plugin.settings.llmMode === 'local'
+                            ? ''
+                            : this.plugin.settings.apiKey.trim())
+                    ) {
+                        return;
+                    }
+
                     if (this.availableModels.length === 0) {
                         new Notice(t('errors.noModels'));
                     } else {
                         new Notice(t('errors.modelsLoaded', { count: this.availableModels.length }));
                     }
                 } catch (error) {
+                    if (requestGeneration !== this.modelsRequestGeneration) {
+                        return;
+                    }
+
                     const message = error instanceof Error ? error.message : t('errors.modelsConnection');
                     new Notice(message);
                 } finally {
-                    this.isFetchingModels = false;
-                    this.display();
+                    if (requestGeneration === this.modelsRequestGeneration) {
+                        this.isFetchingModels = false;
+                        this.display();
+                    }
                 }
     }
 

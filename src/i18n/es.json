@@ -84,6 +84,38 @@
 		"testingAnkiConnection": "Probando conexión...",
 		"ankiConnectionSuccess": "Conexión con AnkiConnect activa (versión {version})."
 	},
+	"help": {
+		"title": "Ayuda",
+		"open": "Abrir guía",
+		"apiKey": {
+			"label": "Cómo obtener una API Key",
+			"description": "Elige tu proveedor para crear una API Key.",
+			"title": "Cómo obtener una API Key",
+			"intro": "Crea una cuenta con uno de estos proveedores, abre su página de API Keys y crea una clave secreta. Cópiala una sola vez y mantenla privada.",
+			"providers": {
+				"openai": "OpenAI: platform.openai.com/api-keys",
+				"openrouter": "OpenRouter: openrouter.ai/keys",
+				"groq": "Groq: console.groq.com/keys",
+				"together": "Together AI: api.together.ai/settings/api-keys",
+				"deepseek": "DeepSeek: platform.deepseek.com/api_keys",
+				"mistral": "Mistral: console.mistral.ai/api-keys"
+			},
+			"finalStep": "Vuelve a esta página de configuración, selecciona Proveedor Externo, elige el proveedor y pega la clave en API Key. Nunca compartas tu clave ni la guardes en una nota o repositorio."
+		},
+		"anki": {
+			"label": "Cómo configurar Anki",
+			"description": "Sigue estos pasos para conectar Anki con el plugin.",
+			"title": "Cómo configurar Anki",
+			"intro": "AnkiConnect permite que este plugin envíe tarjetas a tu aplicación de Anki de escritorio.",
+			"steps": {
+				"download": "Descarga e instala Anki para tu sistema operativo desde apps.ankiweb.net.",
+				"plugin": "Abre Anki, ve a Herramientas > Complementos > Obtener complementos, introduce el código 2055492159 e instala AnkiConnect.",
+				"restart": "Reinicia Anki después de instalar el complemento.",
+				"configure": "Mantén Anki abierto y comprueba que la URL de AnkiConnect en este plugin sea http://localhost:8765."
+			},
+			"finalStep": "Usa Probar conexión arriba para verificar la configuración. Si funciona, el plugin está listo para crear tarjetas en Anki."
+		}
+	},
 	"providers": {
 		"openai": "OpenAI",
 		"openrouter": "OpenRouter",
@@ -94,6 +126,7 @@
 	},
 	"errors": {
 		"invalidModelUrl": "La URL del modelo no es válida.",
+		"missingLlmModel": "Selecciona un modelo LLM antes de generar tarjetas.",
 		"server": "Error del servidor: {status}",
 		"generation": "Error en la generación: {status}",
 		"invalidJson": "No se pudo procesar la respuesta del modelo como un JSON válido.",
@@ -107,10 +140,12 @@
 		"missingModelName": "Debes indicar el nombre del tipo de nota de Anki.",
 		"missingModelFields": "El tipo de nota seleccionado no tiene al menos dos campos.",
 		"missingProviderUrl": "Debes indicar la URL del proveedor o elegir uno de la lista.",
+		"selectedFileUnavailable": "La nota seleccionada ya no está disponible: {file}",
 		"missingApiKey": "Añade la API Key antes de cargar modelos.",
 		"noModels": "No se encontraron modelos. Verifica la URL, el proveedor y la API Key.",
 		"modelsLoaded": "{count} modelos cargados con éxito.",
 		"modelsConnection": "Error de conexión al cargar modelos.",
+		"invalidModelsResponse": "El proveedor de modelos devolvió una respuesta de modelos no válida.",
 		"invalidCardCount": "La cantidad de tarjetas debe ser un número entero mayor que cero.",
 		"cardLimit": "La selección supera el límite de {count} tarjetas por ejecución.",
 		"notSent": "Aún no enviada.",

@@ -1,6 +1,6 @@
 import { MarkdownView, Notice, TFile } from 'obsidian';
 import type AnkiOpenCodePlugin from '../main';
-import { AnkiConnectApi } from './ankiConnectApi';
+import { AnkiConnectApi, DEFAULT_ANKI_CONNECT_SETTINGS } from './ankiConnectApi';
 import { LLMConnector, LLMSettings } from './llmApi';
 import { LLM_PROVIDERS } from '../settings';
 import { t } from '../i18n';
@@ -41,17 +41,26 @@ export class AnkiController {
 		return this.plugin.settings.ankiConnectUrl;
 	}
 
-	async createCards({ cardCount, files, deckName, ankiModels }: CreateCardsOptions): Promise<CardOperation> {
+	async createCards({ cardCount, files, deckName, ankiModels }: CreateCardsOptions): Promise<CardOperation | null> {
 		const normalizedCardCount = this.normalizeCardCount(cardCount);
 		const selectedFiles = files && files.length > 0 ? files : undefined;
 		if (ankiModels.length === 0) throw new Error(t('errors.missingModelName'));
+
 		const notes = selectedFiles
-			? await Promise.all(selectedFiles.map(async (file) => ({
-				source: file.path,
-				text: await this.plugin.app.vault.cachedRead(file),
-			})))
+			? await Promise.all(selectedFiles.map(async (file) => {
+				const currentFile = this.plugin.app.vault.getAbstractFileByPath(file.path);
+				if (!(currentFile instanceof TFile)) {
+					throw new Error(t('errors.selectedFileUnavailable', { file: file.path }));
+				}
+
+				return {
+					source: currentFile.path,
+					text: await this.plugin.app.vault.cachedRead(currentFile),
+				};
+			}))
 			: [this.getActiveNote()];
 
+		if (this.plugin.isUnloaded()) return null;
 		if (notes.length * normalizedCardCount > MAX_GENERATED_CARDS) {
 			throw new Error(t('errors.cardLimit', { count: MAX_GENERATED_CARDS }));
 		}
@@ -60,6 +69,7 @@ export class AnkiController {
 		new Notice(t('notices.generating', { count: normalizedCardCount * notes.length }));
 		const cards: TrackedCard[] = [];
 		const ankiCardTypes = ankiModels.map((model) => model.name);
+		const ankiModelFields = Object.fromEntries(ankiModels.map((model) => [model.name, model.fieldNames]));
 		for (const { text, source } of notes) {
 			const generated = await LLMConnector.generateFlashcards(
 				text,
@@ -68,7 +78,10 @@ export class AnkiController {
 				normalizedCardCount,
 				ankiModels[0]?.fieldNames ?? ['Front', 'Back'],
 				ankiCardTypes,
+				ankiModelFields,
 			);
+			if (this.plugin.isUnloaded()) return null;
+
 			cards.push(...generated.map((card) => ({
 				card,
 				source,
@@ -88,12 +101,12 @@ export class AnkiController {
 		}
 
 		const operation: CardOperation = {
-			deckName: deckName ?? this.plugin.settings.defaultDeck,
+			deckName: deckName ?? DEFAULT_ANKI_CONNECT_SETTINGS.deckName,
 			models: ankiModels,
 			cards,
 		};
 		await this.sendCards(operation, false);
-		return operation;
+		return this.plugin.isUnloaded() ? null : operation;
 	}
 
 	async retryPending(operation: CardOperation): Promise<void> {
@@ -101,11 +114,13 @@ export class AnkiController {
 	}
 
 	private async sendCards(operation: CardOperation, verifyUncertain: boolean): Promise<void> {
+		if (this.plugin.isUnloaded()) return;
 		const modelMap = new Map(operation.models.map((model) => [model.name, model]));
 		const candidates = operation.cards.filter((item) =>
 			item.status === 'failed' || (verifyUncertain && item.status === 'uncertain'));
 
 		for (const item of candidates) {
+			if (this.plugin.isUnloaded()) return;
 			if (item.status !== 'uncertain') continue;
 			const modelName = item.card.modelName ?? '';
 			const model = modelMap.get(modelName);
@@ -143,6 +158,7 @@ export class AnkiController {
 		}
 
 		for (const [modelName, items] of groups) {
+			if (this.plugin.isUnloaded()) return;
 			const model = modelMap.get(modelName);
 			if (!model) {
 				items.forEach((item) => { item.error = t('errors.missingModelName'); });
@@ -160,7 +176,6 @@ export class AnkiController {
 						item.status = 'created';
 						delete item.error;
 					} else {
-						// A null result can mean the note already exists; verify before retrying.
 						item.status = 'uncertain';
 						item.error = t('errors.cardNotAdded');
 					}

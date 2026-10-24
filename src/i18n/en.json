@@ -84,6 +84,38 @@
 		"testingAnkiConnection": "Testing connection...",
 		"ankiConnectionSuccess": "AnkiConnect connection is active (version {version})."
 	},
+	"help": {
+		"title": "Help",
+		"open": "Open guide",
+		"apiKey": {
+			"label": "How to get an API key",
+			"description": "Choose your provider below to create an API key.",
+			"title": "How to get an API key",
+			"intro": "Create an account with one of these providers, open its API keys page, and create a new secret key. Copy it once and keep it private.",
+			"providers": {
+				"openai": "OpenAI: platform.openai.com/api-keys",
+				"openrouter": "OpenRouter: openrouter.ai/keys",
+				"groq": "Groq: console.groq.com/keys",
+				"together": "Together AI: api.together.ai/settings/api-keys",
+				"deepseek": "DeepSeek: platform.deepseek.com/api_keys",
+				"mistral": "Mistral: console.mistral.ai/api-keys"
+			},
+			"finalStep": "Return to this settings page, select External Provider, choose the provider, and paste the key into API Key. Never share your key or commit it to a note or repository."
+		},
+		"anki": {
+			"label": "How to configure Anki",
+			"description": "Follow these steps to connect Anki to the plugin.",
+			"title": "How to configure Anki",
+			"intro": "AnkiConnect lets this plugin send cards to your desktop Anki application.",
+			"steps": {
+				"download": "Download and install Anki for your operating system from apps.ankiweb.net.",
+				"plugin": "Open Anki, go to Tools > Add-ons > Get Add-ons, enter code 2055492159, and install AnkiConnect.",
+				"restart": "Restart Anki after installing the add-on.",
+				"configure": "Keep Anki open and make sure the AnkiConnect URL in this plugin is http://localhost:8765."
+			},
+			"finalStep": "Use Test connection above to verify the setup. If it succeeds, the plugin is ready to create cards in Anki."
+		}
+	},
 	"providers": {
 		"openai": "OpenAI",
 		"openrouter": "OpenRouter",
@@ -94,6 +126,7 @@
 	},
 	"errors": {
 		"invalidModelUrl": "The model URL is not valid.",
+		"missingLlmModel": "Select an LLM model before generating cards.",
 		"server": "Server error: {status}",
 		"generation": "Generation error: {status}",
 		"invalidJson": "The model response could not be processed as valid JSON.",
@@ -107,10 +140,12 @@
 		"missingModelName": "You must specify the Anki note type name.",
 		"missingModelFields": "The selected note type does not have at least two fields.",
 		"missingProviderUrl": "Enter the provider URL or choose one from the list.",
+		"selectedFileUnavailable": "The selected note is no longer available: {file}",
 		"missingApiKey": "Add the API key before loading models.",
 		"noModels": "No models were found. Check the URL, provider, and API key.",
 		"modelsLoaded": "{count} models loaded successfully.",
 		"modelsConnection": "Connection error while loading models.",
+		"invalidModelsResponse": "The model provider returned an invalid models response.",
 		"invalidCardCount": "The number of cards must be an integer greater than zero.",
 		"cardLimit": "The selection exceeds the limit of {count} cards per run.",
 		"notSent": "Not sent yet.",

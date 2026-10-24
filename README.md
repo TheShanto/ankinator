@@ -38,10 +38,13 @@ When a local LLM is selected, the note content is sent to the configured local e
 
 1. Configure the LLM environment in the plugin settings tab.
 2. Choose whether to use a local model or an external provider.
-3. Configure the AnkiConnect URL and the target deck/model.
+3. Configure the AnkiConnect URL and load the available LLM models.
 4. Open a note in Obsidian or select text.
 5. Run the plugin command to create cards.
-6. The plugin reads the content, sends it to the LLM with a generation prompt, parses the response, and creates notes in Anki.
+6. In the creation modal, choose an existing Anki deck or create one, select one or more Anki note types, and set the number of cards.
+7. The plugin reads the content, sends it to the LLM with a generation prompt, parses the response, and creates notes in Anki.
+
+For multiple notes, use the command **Create cards from multiple notes**, filter the vault files, select the notes, and continue to the same creation modal. Decks and note types are loaded from AnkiConnect when the modal opens; they are not configured as fixed values in the plugin settings.
 
 If a card cannot be confirmed, Ankinator opens a result modal grouped by source note. It keeps the generated cards and statuses in memory for that operation only. Before retrying an uncertain result, it checks Anki for a matching note; no recovery data or card content is saved to the vault.
 
@@ -63,15 +66,16 @@ Obsidian note -> LLM generation -> flashcards -> AnkiConnect -> Anki
 │   ├── main.ts                 # Plugin entry point
 │   ├── settings.ts             # Plugin settings and configuration
 │   ├── i18n/
-│   │   ├── index.ts            # i18n runtime, key types, prompt builder
-│   │   ├── en.json             # English strings (reference language)
-│   │   └── es.json             # Spanish strings
+│   │   ├── index.ts             # Internationalization helpers, key types and prompts
+│   │   ├── en.json              # English strings (reference language)
+│   │   └── es.json              # Spanish strings
 │   ├── services/
 │   │   ├── ankiConnectApi.ts    # AnkiConnect integration
 │   │   ├── controller.ts        # Card creation logic
 │   │   └── llmApi.ts            # LLM connection and generation logic
 │   └── ui/
 │       ├── modal.ts             # Main modal for creating cards
+│       ├── cardResultModal.ts   # Per-note results and retry actions
 │       └── noteSelectionModal.ts
 ├── tests/
 │   └── i18n.test.mjs            # Translation verification suite
