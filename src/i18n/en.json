@@ -37,7 +37,21 @@
 		"success": "{count} cards sent to Anki.",
 		"emptyNote": "The active note and selection are empty.",
 		"noActiveFile": "No active Markdown note.",
-		"noCards": "The LLM returned no cards to send to Anki."
+		"noCards": "The LLM returned no cards to send to Anki.",
+		"activeNote": "Active note"
+	},
+	"results": {
+		"title": "Card creation results",
+		"summary": "{created} of {total} cards confirmed in Anki.",
+		"sourceCount": " · {created}/{total}",
+		"errorCount": "{count} cards: {message}",
+		"retry": "Retry pending cards",
+		"retrying": "Retrying...",
+		"status": {
+			"created": "Created",
+			"failed": "Not created",
+			"uncertain": "Unconfirmed"
+		}
 	},
 	"settings": {
 		"title": "LLM Engine Settings",
@@ -98,6 +112,9 @@
 		"modelsLoaded": "{count} models loaded successfully.",
 		"modelsConnection": "Connection error while loading models.",
 		"invalidCardCount": "The number of cards must be an integer greater than zero.",
-		"cardLimit": "The selection exceeds the limit of {count} cards per run."
+		"cardLimit": "The selection exceeds the limit of {count} cards per run.",
+		"notSent": "Not sent yet.",
+		"cardNotAdded": "Anki did not add this card.",
+		"verificationFailed": "Could not verify whether this card exists in Anki."
 	}
 }

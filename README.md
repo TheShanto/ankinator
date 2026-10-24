@@ -25,6 +25,7 @@ When a local LLM is selected, the note content is sent to the configured local e
 - Sends generated cards to Anki through AnkiConnect.
 - Lets you configure the target deck, Anki model, and card field names.
 - Enforces a total card generation limit to prevent excessive use.
+- Shows per-note creation results and lets you retry pending cards without regenerating them.
 
 ## Use cases
 
@@ -41,6 +42,8 @@ When a local LLM is selected, the note content is sent to the configured local e
 4. Open a note in Obsidian or select text.
 5. Run the plugin command to create cards.
 6. The plugin reads the content, sends it to the LLM with a generation prompt, parses the response, and creates notes in Anki.
+
+If a card cannot be confirmed, Ankinator opens a result modal grouped by source note. It keeps the generated cards and statuses in memory for that operation only. Before retrying an uncertain result, it checks Anki for a matching note; no recovery data or card content is saved to the vault.
 
 In simple terms, the workflow is:
 
